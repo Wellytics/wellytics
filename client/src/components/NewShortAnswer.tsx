@@ -1,6 +1,6 @@
 import { Checkbox, Input } from 'antd'
 import React, { FC, useCallback } from 'react'
-import { NewQuestionProps } from '../routes/dashboard/new'
+import { NewQuestionProps } from '../routes/dashboard/edit'
 import { ShortAnswerQuestion } from '../typings'
 import { CheckboxChangeEvent } from 'antd/es/checkbox'
 

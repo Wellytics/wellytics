@@ -21,27 +21,16 @@ CORS(flask_app)
 # KEYWORDS_THRESHOLD = 0.7
 # EMOTIONS_THRESHOLD = 0.7
 
-_KEYWORDS_MODEL = "yanekyuk/bert-uncased-keyword-extractor"
-_EMOTIONS_MODEL = "joeddav/distilbert-base-uncased-go-emotions-student"
+# _KEYWORDS_MODEL = "yanekyuk/bert-uncased-keyword-extractor"
+# _EMOTIONS_MODEL = "joeddav/distilbert-base-uncased-go-emotions-student"
 
-_keywords_pipeline = pipeline("ner", model=_KEYWORDS_MODEL)
+# _keywords_pipeline = pipeline("ner", model=_KEYWORDS_MODEL)
 
-_emotions_pipeline = pipeline(
-    "text-classification",
-    model=_EMOTIONS_MODEL,
-    return_all_scores=True,
-)
-
-_jobs: Dict[str, OrderedDict[str, "Job"]] = {}
-_job_lock = threading.Lock()
-
-
-class Job(BaseModel):
-    id: str
-    status: str
-    result: str
-
-
+# _emotions_pipeline = pipeline(
+#     "text-classification",
+#     model=_EMOTIONS_MODEL,
+#     return_all_scores=True,
+# )
 # def _get_keywords(text: str):
 #     outputs = _keywords_pipeline(text)
 #     outputs = sorted(outputs, key=lambda x: x["start"])
@@ -82,20 +71,37 @@ class Job(BaseModel):
 #     return jsonify(_get_emotions(request.json["text"]))
 
 
+_jobs: Dict[str, OrderedDict[str, "Job"]] = {}
+_job_lock = threading.Lock()
+
+
+class Job(BaseModel):
+    id: str
+    status: str
+    result: str
+
+
 @flask_app.route("/forms", methods=["GET", "POST"])
 def create_or_get_forms():
     def create_form():
-        pass
+        form = request.get_json()
+        firestore.collection("forms").document(form["id"]).set(form)
+        return jsonify(True)
 
     def get_forms():
-        pass
+        forms_ref = firestore.collection("forms")
+        forms = forms_ref.stream()
+        forms = [form.to_dict() for form in forms]
+        return jsonify(forms)
 
     return create_form() if request.method == "POST" else get_forms()
 
 
 @flask_app.route("/forms/<form_id>", methods=["GET"])
 def get_form(form_id: str):
-    pass
+    form_ref = firestore.collection("forms").document(form_id)
+    form = form_ref.get().to_dict()
+    return jsonify(form)
 
 
 @flask_app.route("/forms/<form_id>/jobs", methods=["GET"])

@@ -1,8 +1,43 @@
-export const createForm = async () => { }
+import { buildUrl } from "build-url-ts"
+import { Form } from "./typings"
 
-export const getForms = async () => { }
+const API_URL = 'http://localhost:5000';
 
-export const getForm = async (formId: string) => { }
+export const createForm = async (form: Form): Promise<boolean> => {
+    const url = buildUrl(API_URL, {
+        path: 'forms',
+    });
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+    });
+
+    return await response.json();
+}
+
+export const getForms = async (): Promise<Form[]> => {
+    const url = buildUrl(API_URL, {
+        path: 'forms',
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
+}
+
+export const getForm = async (formId: string): Promise<Form> => {
+    const url = buildUrl(API_URL, {
+        path: `forms/${formId}`,
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
+}
 
 export const getJobs = async (formId: string) => { }
 
