@@ -7,19 +7,9 @@ import { Form } from './routes/form';
 import { Dashboard } from './routes/dashboard';
 import { DashboardEditForm } from './routes/dashboard/edit';
 import { DashboardNewForm } from './routes/dashboard/new';
-import { About } from './routes/about';
-import { Index } from './routes';
 import { DashboardViewForm } from './routes/dashboard/view';
 
 const router = createHashRouter([
-  {
-    path: "/",
-    element: <Index />
-  },
-  {
-    path: "about",
-    element: <About />
-  },
   {
     path: "forms/:id",
     element: <Form />

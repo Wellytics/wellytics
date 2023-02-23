@@ -1,8 +1,6 @@
-export type QuestionType = string;
-
 export interface BaseQuestion {
     id: string;
-    type: QuestionType;
+    type: string;
     required: boolean;
     question: string;
     placeholder?: string;
@@ -74,4 +72,60 @@ export interface Form {
     title: string;
     description: string;
     questions: Question[];
+}
+
+export interface BaseAnswer {
+    id: string;
+    type: string;
+    questionId: string;
+    answer: string;
+}
+
+export interface ShortAnswerAnswer extends BaseAnswer {
+    type: 'ShortAnswer';
+}
+
+export interface LongAnswerAnswer extends BaseAnswer {
+    type: 'LongAnswer';
+}
+
+export interface MultipleChoiceAnswer extends BaseAnswer {
+    type: 'MultipleChoice';
+}
+
+export interface CheckboxAnswer extends BaseAnswer {
+    type: 'Checkbox';
+}
+
+export interface DropdownAnswer extends BaseAnswer {
+    type: 'Dropdown';
+}
+
+export interface LinearScaleAnswer extends BaseAnswer {
+    type: 'LinearScale';
+}
+
+export interface MultipleChoiceGridAnswer extends BaseAnswer {
+    type: 'MultipleChoiceGrid';
+}
+
+export interface CheckboxGridAnswer extends BaseAnswer {
+    type: 'CheckboxGrid';
+}
+
+export interface DateAnswer extends BaseAnswer {
+    type: 'Date';
+}
+
+export interface TimeAnswer extends BaseAnswer {
+    type: 'Time';
+}
+
+export type Answer = ShortAnswerAnswer | LongAnswerAnswer | MultipleChoiceAnswer | CheckboxAnswer | DropdownAnswer | LinearScaleAnswer | MultipleChoiceGridAnswer | CheckboxGridAnswer | DateAnswer | TimeAnswer;
+
+export interface Response {
+    id: string;
+    formId: string;
+    trackingId: string;
+    answers: Answer[];
 }

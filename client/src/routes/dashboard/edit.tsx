@@ -7,16 +7,16 @@ import { LinearScaleQuestion } from '../../typings'
 import { MultipleChoiceGridQuestion } from '../../typings'
 import { DateQuestion } from '../../typings'
 import { TimeQuestion } from '../../typings'
-import { NewShortAnswer } from '../../components/NewShortAnswer'
-import { NewTime } from '../../components/NewTime'
-import { NewDate } from '../../components/NewDate'
-import { NewCheckboxGrid } from '../../components/NewCheckboxGrid'
-import { NewMultipleChoiceGrid } from '../../components/NewMultipleChoiceGrid'
-import { NewLinearScale } from '../../components/NewLinearScale'
-import { NewDropdown } from '../../components/NewDropdown'
-import { NewCheckbox } from '../../components/NewCheckbox'
-import { NewMultipleChoice } from '../../components/NewMultipleChoice'
-import { NewLongAnswer } from '../../components/NewLongAnswer'
+import { EditShortAnswer } from '../../components/edit/EditShortAnswer'
+import { EditTime } from '../../components/edit/EditTime'
+import { EditDate } from '../../components/edit/EditDate'
+import { EditCheckboxGrid } from '../../components/edit/EditCheckboxGrid'
+import { EditMultipleChoiceGrid } from '../../components/edit/EditMultipleChoiceGrid'
+import { EditLinearScale } from '../../components/edit/EditLinearScale'
+import { EditDropdown } from '../../components/edit/EditDropdown'
+import { EditCheckbox } from '../../components/edit/EditCheckbox'
+import { EditMultipleChoice } from '../../components/edit/EditMultipleChoice'
+import { EditLongAnswer } from '../../components/edit/EditLongAnswer'
 import { createForm, getForm } from '../../api'
 import { useParams } from 'react-router-dom'
 
@@ -45,28 +45,28 @@ export const questionTypes = [
 
 export const questionTypeOptions = questionTypes.map((type) => ({ value: type, label: type }))
 
-export const renderQuestion = (question: Question, dispatch: Dispatch<Action>) => {
+export const renderEditQuestion = (question: Question, dispatch: Dispatch<Action>) => {
   switch (question.type) {
     case "ShortAnswer":
-      return <NewShortAnswer key={question.id} question={question} dispatch={dispatch} />
+      return <EditShortAnswer key={question.id} question={question} dispatch={dispatch} />
     case "LongAnswer":
-      return <NewLongAnswer key={question.id} question={question} dispatch={dispatch} />
+      return <EditLongAnswer key={question.id} question={question} dispatch={dispatch} />
     case "MultipleChoice":
-      return <NewMultipleChoice key={question.id} question={question} dispatch={dispatch} />
+      return <EditMultipleChoice key={question.id} question={question} dispatch={dispatch} />
     case "Checkbox":
-      return <NewCheckbox key={question.id} question={question} dispatch={dispatch} />
+      return <EditCheckbox key={question.id} question={question} dispatch={dispatch} />
     case "Dropdown":
-      return <NewDropdown key={question.id} question={question} dispatch={dispatch} />
+      return <EditDropdown key={question.id} question={question} dispatch={dispatch} />
     case "LinearScale":
-      return <NewLinearScale key={question.id} question={question} dispatch={dispatch} />
+      return <EditLinearScale key={question.id} question={question} dispatch={dispatch} />
     case "MultipleChoiceGrid":
-      return <NewMultipleChoiceGrid key={question.id} question={question} dispatch={dispatch} />
+      return <EditMultipleChoiceGrid key={question.id} question={question} dispatch={dispatch} />
     case "CheckboxGrid":
-      return <NewCheckboxGrid key={question.id} question={question} dispatch={dispatch} />
+      return <EditCheckboxGrid key={question.id} question={question} dispatch={dispatch} />
     case "Date":
-      return <NewDate key={question.id} question={question} dispatch={dispatch} />
+      return <EditDate key={question.id} question={question} dispatch={dispatch} />
     case "Time":
-      return <NewTime key={question.id} question={question} dispatch={dispatch} />
+      return <EditTime key={question.id} question={question} dispatch={dispatch} />
   }
 }
 
@@ -267,7 +267,7 @@ export const DashboardEditForm = () => {
       <Input placeholder="Description" value={description} onChange={onChangeDescription} />
 
       <div>
-        {questions.map((question: Question) => renderQuestion(question, dispatch))}
+        {questions.map((question: Question) => renderEditQuestion(question, dispatch))}
       </div>
 
       <Select
