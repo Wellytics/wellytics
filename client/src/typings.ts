@@ -42,15 +42,20 @@ export interface LinearScaleQuestion extends BaseQuestion {
     max: number;
 }
 
+export interface SubQuestion {
+    id: string;
+    question: string;
+}
+
 export interface MultipleChoiceGridQuestion extends Omit<BaseQuestion, "question"> {
     type: 'MultipleChoiceGrid';
-    questions: string[];
+    questions: SubQuestion[];
     options: Option[];
 }
 
 export interface CheckboxGridQuestion extends Omit<BaseQuestion, "question"> {
     type: 'CheckboxGrid';
-    questions: string[];
+    questions: SubQuestion[];
     options: Option[];
 }
 

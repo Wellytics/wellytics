@@ -1,5 +1,5 @@
 import { Button, Input, Select } from 'antd'
-import React, { Dispatch, useCallback, useReducer, useState } from 'react'
+import React, { Dispatch, useCallback, useMemo, useReducer, useState } from 'react'
 import { LongAnswerQuestion, Question, ShortAnswerQuestion, MultipleChoiceQuestion, CheckboxQuestion, CheckboxGridQuestion } from '../../typings'
 import { v4 as uuid } from 'uuid'
 import { DropdownQuestion } from '../../typings'
@@ -23,8 +23,8 @@ interface Action {
   payload?: any;
 }
 
-export interface NewQuestionProps {
-  question: Question;
+export interface NewQuestionProps<T = Question> {
+  question: T;
   dispatch: Dispatch<Action>;
 }
 
@@ -165,6 +165,13 @@ export const resolveEmptyOption = () => {
   }
 }
 
+export const resolveEmptySubQuestion = () => {
+  return {
+    id: uuid(),
+    question: "",
+  }
+}
+
 const questionsReducer = (questions: Question[], action: Action) => {
   switch (action.type) {
     case "new":
@@ -194,6 +201,24 @@ const questionsReducer = (questions: Question[], action: Action) => {
           )
         } : question
       );
+    case "newSubQuestion":
+      return questions.map((question) =>
+        question.id === action.payload.id ? {
+          ...question,
+          // @ts-ignore
+          questions: [...question.questions!, resolveEmptySubQuestion()]
+        } : question
+      );
+    case "updateSubQuestion":
+      return questions.map((question) =>
+        question.id === action.payload.id ? {
+          ...question,
+          // @ts-ignore
+          questions: question.questions!.map((subQuestion) =>
+            subQuestion.id === action.payload.subQuestionId ? { ...subQuestion, ...action.payload.patch } : subQuestion
+          )
+        } : question
+      );
     default:
       return questions;
   }
@@ -202,17 +227,29 @@ const questionsReducer = (questions: Question[], action: Action) => {
 export const DashboardNewForm = () => {
   const [questions, dispatch] = useReducer(questionsReducer, []);
 
+  const id = useMemo(() => uuid(), []);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
 
   const [selectedType, setSelectedType] = useState<string>(questionTypes[0]);
 
+  const onChangeTitle = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setTitle(e.target.value);
+  }, [setTitle]);
+
+  const onChangeDescription = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+    setDescription(e.target.value);
+  }, [setDescription]);
+
+  const onClickSave = useCallback(() => {
+    console.log({ id, title, description, questions })
+  }, [id, title, description, questions]);
 
   return (
     <div>
-      <Input placeholder="Title" />
+      <Input placeholder="Title" value={title} onChange={onChangeTitle} />
 
-      <Input placeholder="Description" />
+      <Input placeholder="Description" value={description} onChange={onChangeDescription} />
 
       <div>
         {questions.map((question) => renderQuestion(question, dispatch))}
@@ -228,7 +265,7 @@ export const DashboardNewForm = () => {
         Add question
       </Button>
 
-      <Button>
+      <Button onClick={onClickSave}>
         Save
       </Button>
     </div>
