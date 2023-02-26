@@ -1,10 +1,9 @@
 import { Button, Checkbox, Input } from 'antd'
 import React, { FC } from 'react'
-import { NewQuestionProps } from '../../routes/dashboard/edit'
-import { MultipleChoiceQuestion } from '../../typings'
-import { useEdit } from './EditBase'
+import { MultipleChoiceQuestion, EditQuestionProps } from '../../typings'
+import { useEdit } from './base'
 
-export const EditMultipleChoice: FC<NewQuestionProps<MultipleChoiceQuestion>> = ({ question, dispatch }) => {
+export const EditMultipleChoice: FC<EditQuestionProps<MultipleChoiceQuestion>> = ({ question, dispatch }) => {
   const {
     onChangeQuestion,
     onChangePlaceholder,

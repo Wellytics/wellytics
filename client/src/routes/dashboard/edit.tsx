@@ -1,6 +1,6 @@
 import { Button, Input, Select } from 'antd'
 import React, { Dispatch, useCallback, useEffect, useMemo, useReducer, useState } from 'react'
-import { LongAnswerQuestion, Question, ShortAnswerQuestion, MultipleChoiceQuestion, CheckboxQuestion, CheckboxGridQuestion } from '../../typings'
+import { LongAnswerQuestion, Question, ShortAnswerQuestion, MultipleChoiceQuestion, CheckboxQuestion, CheckboxGridQuestion, Action } from '../../typings'
 import { v4 as uuid } from 'uuid'
 import { DropdownQuestion } from '../../typings'
 import { LinearScaleQuestion } from '../../typings'
@@ -19,16 +19,6 @@ import { EditMultipleChoice } from '../../components/edit/EditMultipleChoice'
 import { EditLongAnswer } from '../../components/edit/EditLongAnswer'
 import { createForm, getForm } from '../../api'
 import { useParams } from 'react-router-dom'
-
-export interface Action {
-  type: string;
-  payload?: any;
-}
-
-export interface NewQuestionProps<T = Question> {
-  question: T;
-  dispatch: Dispatch<Action>;
-}
 
 export const questionTypes = [
   "ShortAnswer",

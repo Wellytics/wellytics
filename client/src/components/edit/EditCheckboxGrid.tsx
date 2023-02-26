@@ -1,10 +1,9 @@
 import { Button, Checkbox, Input } from 'antd'
 import React, { FC } from 'react'
-import { NewQuestionProps } from '../../routes/dashboard/edit'
-import { CheckboxGridQuestion } from '../../typings'
-import { useEdit } from './EditBase'
+import { CheckboxGridQuestion, EditQuestionProps } from '../../typings'
+import { useEdit } from './base'
 
-export const EditCheckboxGrid: FC<NewQuestionProps<CheckboxGridQuestion>> = ({ question, dispatch }) => {
+export const EditCheckboxGrid: FC<EditQuestionProps<CheckboxGridQuestion>> = ({ question, dispatch }) => {
   const {
     onChangeSubQuestion,
     onAddSubQuestion,

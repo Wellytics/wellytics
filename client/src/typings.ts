@@ -1,3 +1,5 @@
+import { Dispatch } from "react";
+
 export interface BaseQuestion {
     id: string;
     type: string;
@@ -65,7 +67,17 @@ export interface TimeQuestion extends BaseQuestion {
     type: 'Time';
 }
 
-export type Question = ShortAnswerQuestion | LongAnswerQuestion | MultipleChoiceQuestion | CheckboxQuestion | DropdownQuestion | LinearScaleQuestion | MultipleChoiceGridQuestion | CheckboxGridQuestion | DateQuestion | TimeQuestion;
+export type Question =
+    ShortAnswerQuestion
+    | LongAnswerQuestion
+    | MultipleChoiceQuestion
+    | CheckboxQuestion
+    | DropdownQuestion
+    | LinearScaleQuestion
+    | MultipleChoiceGridQuestion
+    | CheckboxGridQuestion
+    | DateQuestion
+    | TimeQuestion;
 
 export interface Form {
     id: string;
@@ -128,4 +140,19 @@ export interface Response {
     formId: string;
     trackingId: string;
     answers: Answer[];
+}
+
+export interface Action {
+    type: string;
+    payload?: any;
+}
+
+export interface EditQuestionProps<T = Question> {
+    question: T;
+    dispatch: Dispatch<Action>;
+}
+
+export interface QuestionProps<T = Question> {
+    question: T;
+    dispatch: Dispatch<Action>;
 }

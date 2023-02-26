@@ -1,10 +1,9 @@
 import { Checkbox, Input } from 'antd'
 import React, { FC } from 'react'
-import { NewQuestionProps } from '../../routes/dashboard/edit'
-import { ShortAnswerQuestion } from '../../typings'
-import { useEdit } from './EditBase'
+import { EditQuestionProps, ShortAnswerQuestion } from '../../typings'
+import { useEdit } from './base'
 
-export const EditShortAnswer: FC<NewQuestionProps<ShortAnswerQuestion>> = ({ question, dispatch }) => {
+export const EditShortAnswer: FC<EditQuestionProps<ShortAnswerQuestion>> = ({ question, dispatch }) => {
   const {
     onChangeQuestion,
     onChangePlaceholder,

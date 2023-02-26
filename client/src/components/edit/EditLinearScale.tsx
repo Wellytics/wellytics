@@ -1,10 +1,9 @@
 import { Checkbox, Input } from 'antd'
 import React, { FC } from 'react'
-import { NewQuestionProps } from '../../routes/dashboard/edit'
-import { LinearScaleQuestion } from '../../typings'
-import { useEdit } from './EditBase'
+import { LinearScaleQuestion, EditQuestionProps } from '../../typings'
+import { useEdit } from './base'
 
-export const EditLinearScale: FC<NewQuestionProps<LinearScaleQuestion>> = ({ question, dispatch }) => {
+export const EditLinearScale: FC<EditQuestionProps<LinearScaleQuestion>> = ({ question, dispatch }) => {
   const {
     onChangeQuestion,
     onChangePlaceholder,

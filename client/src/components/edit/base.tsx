@@ -1,6 +1,6 @@
 import { Dispatch, useCallback, useMemo } from "react"
-import { Action } from "../../routes/dashboard/edit"
 import { CheckboxChangeEvent } from "antd/es/checkbox"
+import { Action } from "../../typings"
 
 export const useEdit = (questionId: string, dispatch: Dispatch<Action>) => {
     const onChangeQuestion = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
