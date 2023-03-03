@@ -1,7 +1,9 @@
-import { Button, Checkbox, Input } from 'antd'
+import { Button, Checkbox, Input, Typography } from 'antd'
 import React, { FC } from 'react'
 import { CheckboxGridQuestion, EditQuestionProps } from '../../typings'
 import { useEdit } from './base'
+
+const { Title } = Typography
 
 export const EditCheckboxGrid: FC<EditQuestionProps<CheckboxGridQuestion>> = ({ question, dispatch }) => {
   const {
@@ -15,6 +17,8 @@ export const EditCheckboxGrid: FC<EditQuestionProps<CheckboxGridQuestion>> = ({ 
 
   return (
     <div>
+      <Title level={4}>Checkbox grid</Title>
+
       <div>
         {question.questions.map((question, i) => (
           <Input key={question.id} placeholder="Question" value={question.question} onChange={(e) => onChangeSubQuestion(question.id, e)} />

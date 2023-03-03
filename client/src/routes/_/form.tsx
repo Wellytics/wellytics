@@ -18,7 +18,7 @@ import { EditCheckbox } from '../../components/edit/EditCheckbox'
 import { EditMultipleChoice } from '../../components/edit/EditMultipleChoice'
 import { EditLongAnswer } from '../../components/edit/EditLongAnswer'
 import { createForm, getForm } from '../../api'
-import { useParams } from 'react-router-dom'
+import { useNavigate, useParams } from 'react-router-dom'
 
 export const questionTypes = [
   "ShortAnswer",
@@ -194,6 +194,7 @@ export const questionsReducer = (questions: Question[], action: Action) => {
           )
         } : question
       );
+
     case "newSubQuestion":
       return questions.map((question) =>
         question.id === action.payload.id ? {
@@ -217,7 +218,8 @@ export const questionsReducer = (questions: Question[], action: Action) => {
   }
 }
 
-export const DashboardEditForm = () => {
+export const DashboardForm = () => {
+  const navigate = useNavigate();
   const { id: _id } = useParams();
   const id = useMemo(() => _id!, [_id])
 
@@ -250,11 +252,19 @@ export const DashboardEditForm = () => {
     console.log(await createForm(form));
   }, [id, title, description, questions]);
 
+  const onClickFormResponses = useCallback((id: string) => {
+    navigate(`/_/forms/${id}/responses`);
+  }, [navigate]);
+
   return ready ? (
     <div>
       <Input placeholder="Title" value={title} onChange={onChangeTitle} />
 
       <Input placeholder="Description" value={description} onChange={onChangeDescription} />
+
+      <Button onClick={() => onClickFormResponses(id)}>
+        Responses
+      </Button>
 
       <div>
         {questions.map((question: Question) => renderEditQuestion(question, dispatch))}

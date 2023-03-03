@@ -1,7 +1,9 @@
-import { Button, Checkbox, Input } from 'antd'
+import { Button, Checkbox, Input, Typography } from 'antd'
 import React, { FC } from 'react'
 import { CheckboxQuestion, EditQuestionProps } from '../../typings'
 import { useEdit } from './base'
+
+const { Title } = Typography
 
 export const EditCheckbox: FC<EditQuestionProps<CheckboxQuestion>> = ({ question, dispatch }) => {
   const {
@@ -14,6 +16,7 @@ export const EditCheckbox: FC<EditQuestionProps<CheckboxQuestion>> = ({ question
 
   return (
     <div>
+      <Title level={4}>Checkbox</Title>
       <Input placeholder="Question" value={question.question} onChange={onChangeQuestion} />
       <Input placeholder="Placeholder" value={question.placeholder} onChange={onChangePlaceholder} />
       <Checkbox checked={question.required} onChange={onChangeRequired}>Required</Checkbox>

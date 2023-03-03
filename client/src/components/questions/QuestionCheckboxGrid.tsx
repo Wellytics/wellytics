@@ -1,20 +1,23 @@
-import React, { FC } from 'react'
+import React, { FC, useCallback } from 'react'
 import { Checkbox, Typography } from 'antd'
-import { CheckboxGridQuestion, QuestionProps } from '../../typings';
+import { CheckboxGridAnswer, CheckboxGridQuestion, QuestionProps } from '../../typings';
+import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionCheckboxGrid: FC<QuestionProps<CheckboxGridQuestion>> = ({ question: _question, dispatch }) => {
+export const QuestionCheckboxGrid: FC<QuestionProps<CheckboxGridQuestion, CheckboxGridAnswer>> = ({ question: _question, answer, dispatch }) => {
+  const { onChangeSubAnswer } = useAnswer(answer.id, dispatch)
+
   const { questions, options } = _question;
 
   return (
     <div>
-      {questions.map((question) => (
+      {questions.map((question, i) => (
         <div key={question.id}>
           <Title level={4}>{question.question}</Title>
-          <Checkbox.Group>
+          <Checkbox.Group onChange={(values) => onChangeSubAnswer(i, values)}>
             {options.map((option) => (
-              <Checkbox key={option.id}>
+              <Checkbox key={option.id} value={option.id}>
                 {option.label}
               </Checkbox>
             ))}

@@ -1,3 +1,4 @@
+import json
 import threading
 
 from queue import Queue
@@ -117,10 +118,18 @@ def get_job(form_id: str, job_id: str):
 @flask_app.route("/forms/<form_id>/responses", methods=["GET", "POST"])
 def create_or_get_responses(form_id: str):
     def create_response():
-        pass
+        response = request.get_json()
+        response["answers"] = json.dumps(response["answers"])
+        firestore.collection(form_id).document(response["id"]).set(response)
+        return jsonify(True)
 
     def get_responses():
-        pass
+        responses_ref = firestore.collection(form_id)
+        responses = responses_ref.stream()
+        responses = [response.to_dict() for response in responses]
+        for response in responses:
+            response["answers"] = json.loads(response["answers"])
+        return jsonify(responses)
 
     return create_response() if request.method == "POST" else get_responses()
 

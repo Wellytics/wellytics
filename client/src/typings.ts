@@ -105,24 +105,28 @@ export interface MultipleChoiceAnswer extends BaseAnswer {
     type: 'MultipleChoice';
 }
 
-export interface CheckboxAnswer extends BaseAnswer {
+export interface CheckboxAnswer extends Omit<BaseAnswer, "answer"> {
     type: 'Checkbox';
+    answer: string[];
 }
 
 export interface DropdownAnswer extends BaseAnswer {
     type: 'Dropdown';
 }
 
-export interface LinearScaleAnswer extends BaseAnswer {
+export interface LinearScaleAnswer extends Omit<BaseAnswer, "answer"> {
     type: 'LinearScale';
+    answer: number;
 }
 
-export interface MultipleChoiceGridAnswer extends BaseAnswer {
+export interface MultipleChoiceGridAnswer extends Omit<BaseAnswer, "answer"> {
     type: 'MultipleChoiceGrid';
+    answer: string[];
 }
 
-export interface CheckboxGridAnswer extends BaseAnswer {
+export interface CheckboxGridAnswer extends Omit<BaseAnswer, "answer"> {
     type: 'CheckboxGrid';
+    answer: string[][];
 }
 
 export interface DateAnswer extends BaseAnswer {
@@ -152,7 +156,13 @@ export interface EditQuestionProps<T = Question> {
     dispatch: Dispatch<Action>;
 }
 
-export interface QuestionProps<T = Question> {
+export interface QuestionProps<T = Question, U = Answer> {
     question: T;
+    answer: U;
     dispatch: Dispatch<Action>;
+}
+
+export interface AnswerProps<T = Question, U = Answer> {
+    question: T;
+    answers: Answer[];
 }

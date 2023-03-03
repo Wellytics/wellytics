@@ -18,17 +18,19 @@ export const Dashboard = () => {
 
   useEffect(() => { initialize() }, [initialize]);
 
-  const onClickForm = useCallback((id: string) => {
-    navigate(`/dashboard/forms/${id}`);
+  const onClickEditForm = useCallback((id: string) => {
+    navigate(`/_/forms/${id}`);
   }, [navigate]);
 
   return ready ? (
     <div>
-      {forms.map(form => (
-        <Button key={form.id} onClick={() => onClickForm(form.id)}>{form.title}</Button>
-      ))}
+      <div>
+        {forms.map(form => (
+          <Button key={form.id} onClick={() => onClickEditForm(form.id)}>Edit {form.title}</Button>
+        ))}
+      </div>
 
-      <Button onClick={() => navigate('/dashboard/forms/new')}>New Form</Button>
+      <Button onClick={() => navigate('/_/forms/new')}>New Form</Button>
     </div>
   ) : null;
 }

@@ -1,16 +1,19 @@
 import React, { FC } from 'react'
-import { DropdownQuestion, QuestionProps } from '../../typings'
+import { DropdownAnswer, DropdownQuestion, QuestionProps } from '../../typings'
 import { Select, Typography } from 'antd'
+import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionDropdown: FC<QuestionProps<DropdownQuestion>> = ({ question: _question, dispatch }) => {
+export const QuestionDropdown: FC<QuestionProps<DropdownQuestion, DropdownAnswer>> = ({ question: _question, answer, dispatch }) => {
+  const { onChangeAnswer } = useAnswer(answer.id, dispatch)
+
   const { question, options } = _question;
 
   return (
     <div>
       <Title level={4}>{question}</Title>
-      <Select options={options.map((option) => ({
+      <Select onChange={onChangeAnswer} options={options.map((option) => ({
         label: option.label,
         value: option.id,
       }))} />

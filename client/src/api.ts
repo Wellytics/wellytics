@@ -43,9 +43,31 @@ export const getJobs = async (formId: string) => { }
 
 export const getJob = async (formId: string, jobId: string) => { }
 
-export const createResponse = async (formId: string, response: object) => { }
+export const createResponse = async (formId: string, _response: object) => {
+    const url = buildUrl(API_URL, {
+        path: `forms/${formId}/responses`,
+    });
 
-export const getResponses = async (formId: string) => { }
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(_response),
+    });
+
+    return await response.json();
+}
+
+export const getResponses = async (formId: string) => {
+    const url = buildUrl(API_URL, {
+        path: `forms/${formId}/responses`,
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
+}
 
 export const getKeywords = async (formId: string) => { }
 

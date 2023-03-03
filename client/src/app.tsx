@@ -4,31 +4,36 @@ import {
   RouterProvider,
 } from "react-router-dom";
 import { Form } from './routes/form';
-import { Dashboard } from './routes/dashboard';
-import { DashboardEditForm } from './routes/dashboard/edit';
-import { DashboardNewForm } from './routes/dashboard/new';
-import { DashboardViewForm } from './routes/dashboard/view';
+import { Dashboard } from './routes/_';
+import { DashboardForm } from './routes/_/form';
+import { DashboardNewForm } from './routes/_/new';
+import { DashboardFormResponses } from './routes/_/responses';
+import { Index } from './routes';
 
 const router = createHashRouter([
+  {
+    path: "/",
+    element: <Index />
+  },
   {
     path: "forms/:id",
     element: <Form />
   },
   {
-    path: "dashboard",
+    path: "_",
     element: <Dashboard />
   },
   {
-    path: "dashboard/forms/new",
+    path: "_/forms/new",
     element: <DashboardNewForm />
   },
   {
-    path: "dashboard/forms/view/:id",
-    element: <DashboardViewForm />
+    path: "_/forms/:id",
+    element: <DashboardForm />
   },
   {
-    path: "dashboard/forms/:id",
-    element: <DashboardEditForm />
+    path: "_/forms/:id/responses",
+    element: <DashboardFormResponses />
   },
 ]);
 
