@@ -47,13 +47,13 @@ export interface SubQuestion {
     question: string;
 }
 
-export interface MultipleChoiceGridQuestion extends Omit<BaseQuestion, "question"> {
+export interface MultipleChoiceGridQuestion extends BaseQuestion {
     type: 'MultipleChoiceGrid';
     questions: SubQuestion[];
     options: Option[];
 }
 
-export interface CheckboxGridQuestion extends Omit<BaseQuestion, "question"> {
+export interface CheckboxGridQuestion extends BaseQuestion {
     type: 'CheckboxGrid';
     questions: SubQuestion[];
     options: Option[];

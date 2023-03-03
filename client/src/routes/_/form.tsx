@@ -113,6 +113,7 @@ export const resolveEmptyQuestion = (type: string) => {
       return {
         id: uuid(),
         type: "MultipleChoiceGrid",
+        question: "",
         questions: [],
         required: false,
         options: [],
@@ -121,6 +122,7 @@ export const resolveEmptyQuestion = (type: string) => {
       return {
         id: uuid(),
         type: "CheckboxGrid",
+        question: "",
         questions: [],
         required: false,
         options: [],

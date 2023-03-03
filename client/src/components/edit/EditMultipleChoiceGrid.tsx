@@ -7,6 +7,7 @@ const { Title } = Typography
 
 export const EditMultipleChoiceGrid: FC<EditQuestionProps<MultipleChoiceGridQuestion>> = ({ question, dispatch }) => {
   const {
+    onChangeQuestion,
     onChangeSubQuestion,
     onAddSubQuestion,
     onChangePlaceholder,
@@ -18,6 +19,8 @@ export const EditMultipleChoiceGrid: FC<EditQuestionProps<MultipleChoiceGridQues
   return (
     <div>
       <Title level={4}>Multiple Choice Grid</Title>
+
+      <Input placeholder="Parent question" value={question.question} onChange={(e) => onChangeQuestion(e)} />
 
       <div>
         {question.questions.map((question, i) => (

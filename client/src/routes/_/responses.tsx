@@ -1,7 +1,7 @@
-import { Typography } from 'antd'
+import { Button, Typography } from 'antd'
 import React, { useCallback, useEffect, useMemo, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { getForm, getResponses } from '../../api';
+import { getForm, getKeywords, getResponses, joinJob } from '../../api';
 import { Answer, Question, Response } from '../../typings';
 import { AnswerShortAnswer } from '../../components/answers/AnswerShortAnswer';
 import { AnswerLongAnswer } from '../../components/answers/AnswerLongAnswer';
@@ -62,10 +62,24 @@ export const DashboardFormResponses = () => {
 
   useEffect(() => { initialize() }, [initialize]);
 
+  const onClickKeywords = useCallback(async () => {
+    console.log(await joinJob(await getKeywords(id), () => {
+      console.log("progress")
+    }));
+  }, [id]);
+
   return ready ? (
     <div>
       <Typography.Title>{title}</Typography.Title>
       <Typography.Paragraph>{description}</Typography.Paragraph>
+
+      <div>
+        <Button onClick={onClickKeywords}>Keywords</Button>
+        {/* {questions.map((question) => (
+          // @ts-ignore
+          <Button key={question.id}>{question.question}</Button>
+        ))} */}
+      </div>
 
       <div>
         {

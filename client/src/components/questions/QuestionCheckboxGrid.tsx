@@ -12,9 +12,11 @@ export const QuestionCheckboxGrid: FC<QuestionProps<CheckboxGridQuestion, Checkb
 
   return (
     <div>
+      <Title level={4}>{_question.question}</Title>
+
       {questions.map((question, i) => (
         <div key={question.id}>
-          <Title level={4}>{question.question}</Title>
+          <Title level={5}>{question.question}</Title>
           <Checkbox.Group onChange={(values) => onChangeSubAnswer(i, values)}>
             {options.map((option) => (
               <Checkbox key={option.id} value={option.id}>

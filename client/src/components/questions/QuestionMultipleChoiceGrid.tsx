@@ -12,9 +12,11 @@ export const QuestionMultipleChoiceGrid: FC<QuestionProps<MultipleChoiceGridQues
 
   return (
     <div>
+      <Title level={4}>{_question.question}</Title>
+
       {questions.map((question, i) => (
         <div key={question.id}>
-          <Title level={4}>{question.question}</Title>
+          <Title level={5}>{question.question}</Title>
           <Radio.Group onChange={(e) =>
             onChangeSubAnswer(i, e.target.value)
           }>

@@ -7,6 +7,7 @@ const { Title } = Typography
 
 export const EditCheckboxGrid: FC<EditQuestionProps<CheckboxGridQuestion>> = ({ question, dispatch }) => {
   const {
+    onChangeQuestion,
     onChangeSubQuestion,
     onAddSubQuestion,
     onChangePlaceholder,
@@ -19,8 +20,10 @@ export const EditCheckboxGrid: FC<EditQuestionProps<CheckboxGridQuestion>> = ({ 
     <div>
       <Title level={4}>Checkbox grid</Title>
 
+      <Input placeholder="Parent question" value={question.question} onChange={(e) => onChangeQuestion(e)} />
+
       <div>
-        {question.questions.map((question, i) => (
+        {question.questions.map((question) => (
           <Input key={question.id} placeholder="Question" value={question.question} onChange={(e) => onChangeSubQuestion(question.id, e)} />
         ))}
       </div>

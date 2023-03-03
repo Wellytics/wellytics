@@ -1,6 +1,13 @@
 import { buildUrl } from "build-url-ts"
 import { Form } from "./typings"
 
+export interface Job<T = any> {
+    id: string;
+    status: string;
+    error: boolean;
+    output?: T;
+}
+
 const API_URL = 'http://localhost:5000';
 
 export const createForm = async (form: Form): Promise<boolean> => {
@@ -39,9 +46,15 @@ export const getForm = async (formId: string): Promise<Form> => {
     return await response.json();
 }
 
-export const getJobs = async (formId: string) => { }
+export const getJob = async (jobId: string) => {
+    const url = buildUrl(API_URL, {
+        path: `jobs/${jobId}`,
+    });
 
-export const getJob = async (formId: string, jobId: string) => { }
+    const response = await fetch(url);
+
+    return await response.json();
+}
 
 export const createResponse = async (formId: string, _response: object) => {
     const url = buildUrl(API_URL, {
@@ -69,7 +82,15 @@ export const getResponses = async (formId: string) => {
     return await response.json();
 }
 
-export const getKeywords = async (formId: string) => { }
+export const getKeywords = async (formId: string) => {
+    const url = buildUrl(API_URL, {
+        path: `forms/${formId}/responses/keywords`,
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
+}
 
 export const getEmotions = async (formId: string) => { }
 
@@ -82,3 +103,21 @@ export const getResponseKeywords = async (formId: string, responseId: string) =>
 export const getResponseEmotions = async (formId: string, responseId: string) => { }
 
 export const getResponseSummary = async (formId: string, responseId: string) => { }
+
+const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
+
+export const joinJob = async <T,>(
+    jobId: string,
+    onProgressCallback: Function,
+    timeout: number = 250
+): Promise<Job<T>> => {
+    let job = await getJob(jobId);
+
+    while (job.status === 'running') {
+        onProgressCallback(job);
+        await sleep(timeout);
+        job = await getJob(jobId);
+    }
+
+    return job;
+}
