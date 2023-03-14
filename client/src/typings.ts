@@ -91,8 +91,13 @@ export type Question =
     | DateQuestion
     | TimeQuestion;
 
-export interface Form {
+export interface Id {
     id: string;
+    createdAt: number;
+    updatedAt: number;
+}
+
+export interface Form extends Id {
     title: string;
     description: string;
     questions: Question[];
@@ -151,19 +156,16 @@ export interface TimeAnswer extends BaseAnswer {
 
 export type Answer = ShortAnswerAnswer | LongAnswerAnswer | MultipleChoiceAnswer | CheckboxAnswer | DropdownAnswer | LinearScaleAnswer | MultipleChoiceGridAnswer | CheckboxGridAnswer | DateAnswer | TimeAnswer;
 
-export interface MetricDefinition {
-    id: string;
+export interface MetricDefinition extends Id {
     name: string;
     description: string;
 }
 
-export interface Metric {
-    id: string;
-    value: number;
+export interface Metric extends Id {
+    value?: number;
 }
 
-export interface Response {
-    id: string;
+export interface Response extends Id {
     formId: string;
     trackingId: string;
     metrics: Metric[];
@@ -190,3 +192,15 @@ export interface AnswerProps<T = Question, U = Answer> {
     question: T;
     answers: Answer[];
 }
+
+export interface FormView { }
+
+export interface ResponseView { }
+
+export interface FormAnalysis { }
+
+export interface ResponseAnalysis { }
+
+export interface FormAnalysisView { }
+
+export interface ResponseAnalysisView { }

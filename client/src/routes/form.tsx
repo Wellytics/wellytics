@@ -10,6 +10,7 @@ import { v4 as uuid } from 'uuid';
 import { createResponse } from '../api';
 import { renderQuestion, resolveEmptyAnswer } from '../utils';
 import { useTitle } from '../hooks/useTitle';
+import { useTrackingId } from '../hooks/useTrackingId';
 
 const { Title, Text } = Typography;
 
@@ -41,6 +42,7 @@ export const answersReducer = (answers: Answer[], action: Action) => {
 
 export const Form = () => {
   const [title, setTitle] = useTitle("Wellytics - Form")
+  const trackingId = useTrackingId();
 
   const navigate = useNavigate();
   const { id: _formId } = useParams();
@@ -50,7 +52,6 @@ export const Form = () => {
   const [form, setForm] = useState<IForm | null>(null);
 
   const id = useMemo(() => uuid(), []);
-  const trackingId = useMemo(() => uuid(), []);
   const [answers, dispatch] = useReducer(answersReducer, []);
 
   const initialize = useCallback(async () => {
