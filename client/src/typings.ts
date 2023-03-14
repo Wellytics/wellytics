@@ -1,8 +1,20 @@
 import { Dispatch } from "react";
 
+export type QuestionType =
+    'ShortAnswer'
+    | 'LongAnswer'
+    | 'MultipleChoice'
+    | 'Checkbox'
+    | 'Dropdown'
+    | 'LinearScale'
+    | 'MultipleChoiceGrid'
+    | 'CheckboxGrid'
+    | 'Date'
+    | 'Time';
+
 export interface BaseQuestion {
     id: string;
-    type: string;
+    type: QuestionType;
     required: boolean;
     question: string;
     placeholder?: string;
@@ -139,10 +151,22 @@ export interface TimeAnswer extends BaseAnswer {
 
 export type Answer = ShortAnswerAnswer | LongAnswerAnswer | MultipleChoiceAnswer | CheckboxAnswer | DropdownAnswer | LinearScaleAnswer | MultipleChoiceGridAnswer | CheckboxGridAnswer | DateAnswer | TimeAnswer;
 
+export interface MetricDefinition {
+    id: string;
+    name: string;
+    description: string;
+}
+
+export interface Metric {
+    id: string;
+    value: number;
+}
+
 export interface Response {
     id: string;
     formId: string;
     trackingId: string;
+    metrics: Metric[];
     answers: Answer[];
 }
 

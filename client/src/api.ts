@@ -8,10 +8,18 @@ export interface Job<T = any> {
     output?: T;
 }
 
-const API_URL = 'http://localhost:5000';
+const DEFAULT_API_URL = 'http://localhost:5000';
+
+
+export const _loadApiUrl = () =>
+    localStorage.getItem('apiUrl') || DEFAULT_API_URL;
+
+export const _saveApiUrl = (apiUrl: string) =>
+    localStorage.setItem('apiUrl', apiUrl);
+
 
 export const createForm = async (form: Form): Promise<boolean> => {
-    const url = buildUrl(API_URL, {
+    const url = buildUrl(_loadApiUrl(), {
         path: 'forms',
     });
 
@@ -27,7 +35,7 @@ export const createForm = async (form: Form): Promise<boolean> => {
 }
 
 export const getForms = async (): Promise<Form[]> => {
-    const url = buildUrl(API_URL, {
+    const url = buildUrl(_loadApiUrl(), {
         path: 'forms',
     });
 
@@ -37,7 +45,7 @@ export const getForms = async (): Promise<Form[]> => {
 }
 
 export const getForm = async (formId: string): Promise<Form> => {
-    const url = buildUrl(API_URL, {
+    const url = buildUrl(_loadApiUrl(), {
         path: `forms/${formId}`,
     });
 
@@ -47,7 +55,7 @@ export const getForm = async (formId: string): Promise<Form> => {
 }
 
 export const getJob = async (jobId: string) => {
-    const url = buildUrl(API_URL, {
+    const url = buildUrl(_loadApiUrl(), {
         path: `jobs/${jobId}`,
     });
 
@@ -57,7 +65,7 @@ export const getJob = async (jobId: string) => {
 }
 
 export const createResponse = async (formId: string, _response: object) => {
-    const url = buildUrl(API_URL, {
+    const url = buildUrl(_loadApiUrl(), {
         path: `forms/${formId}/responses`,
     });
 
@@ -73,7 +81,7 @@ export const createResponse = async (formId: string, _response: object) => {
 }
 
 export const getResponses = async (formId: string) => {
-    const url = buildUrl(API_URL, {
+    const url = buildUrl(_loadApiUrl(), {
         path: `forms/${formId}/responses`,
     });
 
@@ -83,7 +91,7 @@ export const getResponses = async (formId: string) => {
 }
 
 export const getKeywords = async (formId: string) => {
-    const url = buildUrl(API_URL, {
+    const url = buildUrl(_loadApiUrl(), {
         path: `forms/${formId}/responses/keywords`,
     });
 
@@ -96,7 +104,15 @@ export const getEmotions = async (formId: string) => { }
 
 export const getSummary = async (formId: string) => { }
 
-export const getResponse = async (formId: string, responseId: string) => { }
+export const getResponse = async (formId: string, responseId: string) => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `forms/${formId}/responses/${responseId}`,
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
+}
 
 export const getResponseKeywords = async (formId: string, responseId: string) => { }
 

@@ -5,6 +5,8 @@ import { Button } from 'antd';
 import { useNavigate } from 'react-router-dom';
 
 export const Dashboard = () => {
+  const [title, setTitle] = useState("Wellytics");
+
   const navigate = useNavigate();
 
   const [ready, setReady] = useState(false);
@@ -16,7 +18,7 @@ export const Dashboard = () => {
     setReady(true);
   }, [setReady, setForms]);
 
-  useEffect(() => { initialize() }, [initialize]);
+  useEffect(() => { if (!ready) initialize() }, [ready, initialize]);
 
   const onClickEditForm = useCallback((id: string) => {
     navigate(`/_/forms/${id}`);

@@ -5,10 +5,11 @@ import {
 } from "react-router-dom";
 import { Form } from './routes/form';
 import { Dashboard } from './routes/_';
-import { DashboardForm } from './routes/_/form';
-import { DashboardNewForm } from './routes/_/new';
-import { DashboardFormResponses } from './routes/_/responses';
+import { DashboardForm } from './routes/_/forms';
+import { DashboardNewForm } from './routes/_/forms/new';
+import { DashboardFormResponses } from './routes/_/forms/responses';
 import { Index } from './routes';
+import { DashboardFormResponse } from './routes/_/forms/responses/response';
 
 const router = createHashRouter([
   {
@@ -34,6 +35,10 @@ const router = createHashRouter([
   {
     path: "_/forms/:id/responses",
     element: <DashboardFormResponses />
+  },
+  {
+    path: "_/forms/:id/responses/:responseId",
+    element: <DashboardFormResponse />
   },
 ]);
 
