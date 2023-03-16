@@ -1,6 +1,6 @@
 import { Button, Input, Select } from 'antd'
 import React, { useCallback, useEffect, useMemo, useReducer, useState } from 'react'
-import { LongAnswerQuestion, Question, ShortAnswerQuestion, MultipleChoiceQuestion, CheckboxQuestion, CheckboxGridQuestion, Action } from '../../../typings'
+import { LongAnswerQuestion, Question, ShortAnswerQuestion, MultipleChoiceQuestion, CheckboxQuestion, CheckboxGridQuestion, Action, Form } from '../../../typings'
 import { v4 as uuid } from 'uuid'
 import { DropdownQuestion } from '../../../typings'
 import { LinearScaleQuestion } from '../../../typings'
@@ -82,7 +82,7 @@ export const resolveEmptyQuestion = (type: string) => {
         id: uuid(),
         type: "MultipleChoiceGrid",
         question: "",
-        questions: [],
+        subQuestions: [],
         required: false,
         options: [],
       } as MultipleChoiceGridQuestion
@@ -91,7 +91,7 @@ export const resolveEmptyQuestion = (type: string) => {
         id: uuid(),
         type: "CheckboxGrid",
         question: "",
-        questions: [],
+        subQuestions: [],
         required: false,
         options: [],
       } as CheckboxGridQuestion
@@ -221,7 +221,13 @@ export const DashboardForm = () => {
   }, [setDescription]);
 
   const onClickSave = useCallback(async () => {
-    const form = { id, title: formTitle, description, questions };
+    const form: Form = {
+      id,
+      createdAt: new Date().getTime(),
+      updatedAt: new Date().getTime(),
+      title: formTitle,
+      description, questions
+    };
     console.log(await createForm(form));
   }, [id, formTitle, description, questions]);
 

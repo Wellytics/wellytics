@@ -8,7 +8,7 @@ const { Title } = Typography;
 export const QuestionCheckboxGrid: FC<QuestionProps<CheckboxGridQuestion, CheckboxGridAnswer>> = ({ question: _question, answer, dispatch }) => {
   const { onChangeSubAnswer } = useAnswer(answer.id, dispatch)
 
-  const { questions, options } = _question;
+  const { subQuestions: questions, options } = _question;
 
   return (
     <div>

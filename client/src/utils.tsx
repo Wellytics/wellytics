@@ -9,7 +9,7 @@ import { EditMultipleChoice } from "./components/edit/EditMultipleChoice";
 import { EditMultipleChoiceGrid } from "./components/edit/EditMultipleChoiceGrid";
 import { EditShortAnswer } from "./components/edit/EditShortAnswer";
 import { EditTime } from "./components/edit/EditTime";
-import { QuestionType, EditQuestionProps, Question, Action, Answer, AnswerProps, QuestionProps } from "./typings";
+import { QuestionType, EditQuestionProps, Question, Action, Answer, AnswerProps, QuestionProps, Form } from "./typings";
 import { AnswerCheckbox } from "./components/answers/AnswerCheckbox";
 import { AnswerCheckboxGrid } from "./components/answers/AnswerCheckboxGrid";
 import { AnswerDate } from "./components/answers/AnswerDate";
@@ -113,10 +113,12 @@ export const renderQuestion = (question: Question, answer: Answer, dispatch: Dis
 export const resolveEmptyForm = () => {
     return {
         id: uuid(),
+        createdAt: new Date().getTime(),
+        updatedAt: new Date().getTime(),
         title: '',
         description: '',
         questions: [],
-    }
+    } as Form
 }
 
 
@@ -169,14 +171,14 @@ export const resolveEmptyAnswer = (question: Question) => {
                 id: uuid(),
                 type: "MultipleChoiceGrid",
                 questionId: question.id,
-                answer: question.questions.map(() => ""),
+                answer: question.subQuestions.map(() => ""),
             }
         case "CheckboxGrid":
             return {
                 id: uuid(),
                 type: "CheckboxGrid",
                 questionId: question.id,
-                answer: question.questions.map(() => []),
+                answer: question.subQuestions.map(() => []),
             }
         case "Date":
             return {

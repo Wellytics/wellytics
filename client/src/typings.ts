@@ -1,5 +1,10 @@
 import { Dispatch } from "react";
 
+export interface Option {
+    id: string;
+    label: string;
+}
+
 export type QuestionType =
     'ShortAnswer'
     | 'LongAnswer'
@@ -12,46 +17,12 @@ export type QuestionType =
     | 'Date'
     | 'Time';
 
-export interface BaseQuestion {
+export interface BaseQuestion<T extends QuestionType> {
     id: string;
-    type: QuestionType;
+    type: T;
     required: boolean;
     question: string;
     placeholder?: string;
-}
-
-export interface ShortAnswerQuestion extends BaseQuestion {
-    type: 'ShortAnswer';
-}
-
-export interface LongAnswerQuestion extends BaseQuestion {
-    type: 'LongAnswer';
-}
-
-export interface Option {
-    id: string;
-    label: string;
-}
-
-export interface MultipleChoiceQuestion extends BaseQuestion {
-    type: 'MultipleChoice';
-    options: Option[];
-}
-
-export interface CheckboxQuestion extends BaseQuestion {
-    type: 'Checkbox';
-    options: Option[];
-}
-
-export interface DropdownQuestion extends BaseQuestion {
-    type: 'Dropdown';
-    options: Option[];
-}
-
-export interface LinearScaleQuestion extends BaseQuestion {
-    type: 'LinearScale';
-    min: number;
-    max: number;
 }
 
 export interface SubQuestion {
@@ -59,25 +30,34 @@ export interface SubQuestion {
     question: string;
 }
 
-export interface MultipleChoiceGridQuestion extends BaseQuestion {
-    type: 'MultipleChoiceGrid';
-    questions: SubQuestion[];
+export type ShortAnswerQuestion = BaseQuestion<'ShortAnswer'>;
+
+export type LongAnswerQuestion = BaseQuestion<'LongAnswer'>;
+
+export type MultipleChoiceQuestion = BaseQuestion<'MultipleChoice'> & { options: Option[] };
+
+export type CheckboxQuestion = BaseQuestion<'Checkbox'> & { options: Option[] };
+
+export type DropdownQuestion = BaseQuestion<'Dropdown'> & { options: Option[] };
+
+export type LinearScaleQuestion = BaseQuestion<'LinearScale'> & {
+    min: number;
+    max: number;
+}
+
+export type MultipleChoiceGridQuestion = BaseQuestion<'MultipleChoiceGrid'> & {
+    subQuestions: SubQuestion[];
     options: Option[];
 }
 
-export interface CheckboxGridQuestion extends BaseQuestion {
-    type: 'CheckboxGrid';
-    questions: SubQuestion[];
+export type CheckboxGridQuestion = BaseQuestion<'CheckboxGrid'> & {
+    subQuestions: SubQuestion[];
     options: Option[];
 }
 
-export interface DateQuestion extends BaseQuestion {
-    type: 'Date';
-}
+export type DateQuestion = BaseQuestion<'Date'>;
 
-export interface TimeQuestion extends BaseQuestion {
-    type: 'Time';
-}
+export type TimeQuestion = BaseQuestion<'Time'>;
 
 export type Question =
     ShortAnswerQuestion
@@ -103,59 +83,6 @@ export interface Form extends Id {
     questions: Question[];
 }
 
-export interface BaseAnswer {
-    id: string;
-    type: string;
-    questionId: string;
-    answer: string;
-}
-
-export interface ShortAnswerAnswer extends BaseAnswer {
-    type: 'ShortAnswer';
-}
-
-export interface LongAnswerAnswer extends BaseAnswer {
-    type: 'LongAnswer';
-}
-
-export interface MultipleChoiceAnswer extends BaseAnswer {
-    type: 'MultipleChoice';
-}
-
-export interface CheckboxAnswer extends Omit<BaseAnswer, "answer"> {
-    type: 'Checkbox';
-    answer: string[];
-}
-
-export interface DropdownAnswer extends BaseAnswer {
-    type: 'Dropdown';
-}
-
-export interface LinearScaleAnswer extends Omit<BaseAnswer, "answer"> {
-    type: 'LinearScale';
-    answer: number;
-}
-
-export interface MultipleChoiceGridAnswer extends Omit<BaseAnswer, "answer"> {
-    type: 'MultipleChoiceGrid';
-    answer: string[];
-}
-
-export interface CheckboxGridAnswer extends Omit<BaseAnswer, "answer"> {
-    type: 'CheckboxGrid';
-    answer: string[][];
-}
-
-export interface DateAnswer extends BaseAnswer {
-    type: 'Date';
-}
-
-export interface TimeAnswer extends BaseAnswer {
-    type: 'Time';
-}
-
-export type Answer = ShortAnswerAnswer | LongAnswerAnswer | MultipleChoiceAnswer | CheckboxAnswer | DropdownAnswer | LinearScaleAnswer | MultipleChoiceGridAnswer | CheckboxGridAnswer | DateAnswer | TimeAnswer;
-
 export interface MetricDefinition extends Id {
     name: string;
     description: string;
@@ -169,7 +96,7 @@ export interface Response extends Id {
     formId: string;
     trackingId: string;
     metrics: Metric[];
-    answers: Answer[];
+    answers: Record<string, string | Record<string, string>>;
 }
 
 export interface Action {
@@ -182,15 +109,15 @@ export interface EditQuestionProps<T = Question> {
     dispatch: Dispatch<Action>;
 }
 
-export interface QuestionProps<T = Question, U = Answer> {
+export interface QuestionProps<T = Question, U = any> {
     question: T;
     answer: U;
     dispatch: Dispatch<Action>;
 }
 
-export interface AnswerProps<T = Question, U = Answer> {
+export interface AnswerProps<T = Question, U = any> {
     question: T;
-    answers: Answer[];
+    answers: U[];
 }
 
 export interface FormView { }

@@ -10,7 +10,7 @@ export const AnswerMultipleChoiceGrid: FC<AnswerProps<MultipleChoiceGridQuestion
     <div>
       <Title level={4}>Multiple choice grid</Title>
       <div>
-        {question.questions.map((question, i) => (
+        {question.subQuestions.map((question, i) => (
           <div key={i}>
             <Title level={5}>{question.question}</Title>
             <List

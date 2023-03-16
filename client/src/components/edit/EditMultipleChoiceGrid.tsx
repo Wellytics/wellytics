@@ -23,7 +23,7 @@ export const EditMultipleChoiceGrid: FC<EditQuestionProps<MultipleChoiceGridQues
       <Input placeholder="Parent question" value={question.question} onChange={(e) => onChangeQuestion(e)} />
 
       <div>
-        {question.questions.map((question, i) => (
+        {question.subQuestions.map((question, i) => (
           <Input key={question.id} placeholder="Question" value={question.question} onChange={(e) => onChangeSubQuestion(question.id, e)} />
         ))}
       </div>
