@@ -147,6 +147,22 @@ def form_response_analytics(form_id: str, response_id: str):
     return jsonify(analytics)
 
 
+# NOTE: Should accept `direction` as a query param
+# NOTE: Should accept `amount` as a query param
+@flask_app.route("/forms/<form_id>/questions/<question_id>/move", methods=["POST"])
+def form_question_move(form_id: str, question_id: str):
+    direction = request.args.get("direction", type=str)
+    amount = request.args.get("amount", type=int, default=1)
+
+    if direction not in ["up", "down"]:
+        raise ValueError(f"Invalid direction: {direction}")
+
+    if direction == "up":
+        api.move_question_up(form_id, question_id, amount)
+    elif direction == "down":
+        api.move_question_down(form_id, question_id, amount)
+
+
 @flask_app.route("/questions", methods=["GET", "POST"])
 def questions():
     def create_question():
