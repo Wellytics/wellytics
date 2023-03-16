@@ -119,11 +119,15 @@ def form_response(form_id: str, response_id: str):
     "/forms/<form_id>/responses/<response_id>/metrics", methods=["GET", "POST"]
 )
 def form_response_metrics(form_id: str, response_id: str):
-    # TODO: Metric needs to be added to the response
     def create_response_metric():
-        metric = request.get_json()
-        metric = Metric(**metric)
-        api.create_metric(metric)
+        metric = request.get_json(silent=True)
+        if metric is None:
+            metric_id = request.args.get("id", type=str)
+        else:
+            metric = Metric(**metric)
+            api.create_metric(metric)
+            metric_id = metric.id
+        api.add_metric_to_response(form_id, response_id, metric_id)
 
     def get_response_metrics():
         metrics = api.get_response_metrics(form_id, response_id)
@@ -146,9 +150,14 @@ def form_response_analytics(form_id: str, response_id: str):
 @flask_app.route("/questions", methods=["GET", "POST"])
 def questions():
     def create_question():
-        question = request.get_json()
-        question = Question(**question)
-        api.create_question(question)
+        question = request.get_json(silent=True)
+        if question is None:
+            question_id = request.args.get("id", type=str)
+        else:
+            question = Question(**question)
+            api.create_question(question)
+            question_id = question.id
+        api.add_question_to_form(question.form_id, question_id)
 
     # TODO: Add `query` as a query param
     def get_questions():
