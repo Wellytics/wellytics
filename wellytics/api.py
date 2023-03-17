@@ -7,7 +7,6 @@ from pydantic import BaseModel
 
 from wellytics.utils import uuid, _map, _find_index
 from wellytics.processing import (
-    Job,
     _job_lock,
     _jobs,
     _jobs_queue,
@@ -19,6 +18,7 @@ from wellytics.models import (
     FormAnalyticsCollection,
     FormSnapshot,
     FormView,
+    Job,
     JobStatus,
     JobType,
     Metric,

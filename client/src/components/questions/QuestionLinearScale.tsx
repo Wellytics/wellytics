@@ -1,19 +1,17 @@
 import React, { FC } from 'react'
-import { LinearScaleAnswer, LinearScaleQuestion, QuestionProps } from '../../typings'
+import { LinearScaleQuestion, QuestionProps } from '../../typings'
 import { Slider, Typography } from 'antd'
 import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionLinearScale: FC<QuestionProps<LinearScaleQuestion, LinearScaleAnswer>> = ({ question: _question, answer, dispatch }) => {
-  const { onChangeAnswer } = useAnswer(answer.id, dispatch)
-
-  const { question, min, max } = _question;
+export const QuestionLinearScale: FC<QuestionProps<LinearScaleQuestion, string>> = ({ question, answer, dispatch }) => {
+  const { onChange } = useAnswer(question.id, dispatch)
 
   return (
     <div>
-      <Title level={4}>{question}</Title>
-      <Slider onChange={onChangeAnswer} min={parseInt(min as unknown as string)} max={parseInt(max as unknown as string)} />
+      <Title level={4}>{question.question}</Title>
+      <Slider onChange={onChange} min={parseInt(question.min as unknown as string)} max={parseInt(question.max as unknown as string)} />
     </div>
   )
 }

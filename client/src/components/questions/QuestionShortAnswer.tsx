@@ -1,19 +1,17 @@
 import React, { FC } from 'react'
-import { QuestionProps, ShortAnswerAnswer, ShortAnswerQuestion } from '../../typings'
+import { QuestionProps, ShortAnswerQuestion } from '../../typings'
 import { Input, Typography } from 'antd'
 import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionShortAnswer: FC<QuestionProps<ShortAnswerQuestion, ShortAnswerAnswer>> = ({ question: _question, answer, dispatch }) => {
-  const { onChangeAnswer } = useAnswer(answer.id, dispatch)
-
-  const { question } = _question;
+export const QuestionShortAnswer: FC<QuestionProps<ShortAnswerQuestion, string>> = ({ question, answer, dispatch }) => {
+  const { onChange } = useAnswer(question.id, dispatch)
 
   return (
     <div>
-      <Title level={4}>{question}</Title>
-      <Input onChange={(e) => onChangeAnswer(e.target.value)} />
+      <Title level={4}>{question.question}</Title>
+      <Input onChange={(e) => onChange(e.target.value)} />
     </div>
   )
 }

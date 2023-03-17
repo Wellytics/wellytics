@@ -10,6 +10,7 @@ from wellytics.models import (
     Emotion,
     FormAnalytics,
     FormSnapshot,
+    Job,
     Keyword,
     Response,
     ResponseAnalytics,
@@ -30,7 +31,7 @@ _emotions_pipeline = pipeline(
 )
 
 
-_jobs: dict[str, "Job"] = {}
+_jobs: dict[str, Job] = {}
 _job_lock = threading.Lock()
 _jobs_queue = Queue()
 
@@ -113,14 +114,6 @@ def _get_emotions(text: str):
 
     return outputs
 
-
-class Job(BaseModel):
-    id: str
-    type: str
-    status: str
-    payload: Any
-    result: Optional[Any]
-    callback: Optional[Any]
 
 
 class OrchestratorThread(threading.Thread):

@@ -1,25 +1,25 @@
 import { Dispatch } from "react";
-import { EditCheckbox } from "./components/edit/EditCheckbox";
-import { EditCheckboxGrid } from "./components/edit/EditCheckboxGrid";
-import { EditDate } from "./components/edit/EditDate";
-import { EditDropdown } from "./components/edit/EditDropdown";
-import { EditLinearScale } from "./components/edit/EditLinearScale";
-import { EditLongAnswer } from "./components/edit/EditLongAnswer";
-import { EditMultipleChoice } from "./components/edit/EditMultipleChoice";
-import { EditMultipleChoiceGrid } from "./components/edit/EditMultipleChoiceGrid";
-import { EditShortAnswer } from "./components/edit/EditShortAnswer";
-import { EditTime } from "./components/edit/EditTime";
-import { QuestionType, EditQuestionProps, Question, Action, Answer, AnswerProps, QuestionProps, Form } from "./typings";
-import { AnswerCheckbox } from "./components/answers/AnswerCheckbox";
-import { AnswerCheckboxGrid } from "./components/answers/AnswerCheckboxGrid";
-import { AnswerDate } from "./components/answers/AnswerDate";
-import { AnswerDropdown } from "./components/answers/AnswerDropdown";
-import { AnswerLinearScale } from "./components/answers/AnswerLinearScale";
-import { AnswerLongAnswer } from "./components/answers/AnswerLongAnswer";
-import { AnswerMultipleChoice } from "./components/answers/AnswerMultipleChoice";
-import { AnswerMultipleChoiceGrid } from "./components/answers/AnswerMultipleChoiceGrid";
-import { AnswerShortAnswer } from "./components/answers/AnswerShortAnswer";
-import { AnswerTime } from "./components/answers/AnswerTime";
+// import { EditCheckbox } from "./components/edit/EditCheckbox";
+// import { EditCheckboxGrid } from "./components/edit/EditCheckboxGrid";
+// import { EditDate } from "./components/edit/EditDate";
+// import { EditDropdown } from "./components/edit/EditDropdown";
+// import { EditLinearScale } from "./components/edit/EditLinearScale";
+// import { EditLongAnswer } from "./components/edit/EditLongAnswer";
+// import { EditMultipleChoice } from "./components/edit/EditMultipleChoice";
+// import { EditMultipleChoiceGrid } from "./components/edit/EditMultipleChoiceGrid";
+// import { EditShortAnswer } from "./components/edit/EditShortAnswer";
+// import { EditTime } from "./components/edit/EditTime";
+import { QuestionType, EditQuestionProps, Question, Action, AnswerProps, QuestionProps, Form, JobStatus, Answer } from "./typings";
+// import { AnswerCheckbox } from "./components/answers/AnswerCheckbox";
+// import { AnswerCheckboxGrid } from "./components/answers/AnswerCheckboxGrid";
+// import { AnswerDate } from "./components/answers/AnswerDate";
+// import { AnswerDropdown } from "./components/answers/AnswerDropdown";
+// import { AnswerLinearScale } from "./components/answers/AnswerLinearScale";
+// import { AnswerLongAnswer } from "./components/answers/AnswerLongAnswer";
+// import { AnswerMultipleChoice } from "./components/answers/AnswerMultipleChoice";
+// import { AnswerMultipleChoiceGrid } from "./components/answers/AnswerMultipleChoiceGrid";
+// import { AnswerShortAnswer } from "./components/answers/AnswerShortAnswer";
+// import { AnswerTime } from "./components/answers/AnswerTime";
 import { QuestionCheckbox } from "./components/questions/QuestionCheckbox";
 import { QuestionCheckboxGrid } from "./components/questions/QuestionCheckboxGrid";
 import { QuestionDate } from "./components/questions/QuestionDate";
@@ -31,32 +31,33 @@ import { QuestionMultipleChoiceGrid } from "./components/questions/QuestionMulti
 import { QuestionShortAnswer } from "./components/questions/QuestionShortAnswer";
 import { QuestionTime } from "./components/questions/QuestionTime";
 import { v4 as uuid } from 'uuid';
+import { getJob } from "./api";
 
-export const typeToEdit: Record<QuestionType, React.FC<EditQuestionProps<any>>> = {
-    ShortAnswer: EditShortAnswer,
-    LongAnswer: EditLongAnswer,
-    MultipleChoice: EditMultipleChoice,
-    Checkbox: EditCheckbox,
-    Dropdown: EditDropdown,
-    LinearScale: EditLinearScale,
-    MultipleChoiceGrid: EditMultipleChoiceGrid,
-    CheckboxGrid: EditCheckboxGrid,
-    Date: EditDate,
-    Time: EditTime,
-}
+// export const typeToEdit: Record<QuestionType, React.FC<EditQuestionProps<any>>> = {
+//     ShortAnswer: EditShortAnswer,
+//     LongAnswer: EditLongAnswer,
+//     MultipleChoice: EditMultipleChoice,
+//     Checkbox: EditCheckbox,
+//     Dropdown: EditDropdown,
+//     LinearScale: EditLinearScale,
+//     MultipleChoiceGrid: EditMultipleChoiceGrid,
+//     CheckboxGrid: EditCheckboxGrid,
+//     Date: EditDate,
+//     Time: EditTime,
+// }
 
-export const typeToAnswer: Record<QuestionType, React.FC<AnswerProps<any>>> = {
-    "ShortAnswer": AnswerShortAnswer,
-    "LongAnswer": AnswerLongAnswer,
-    "MultipleChoice": AnswerMultipleChoice,
-    "Checkbox": AnswerCheckbox,
-    "Dropdown": AnswerDropdown,
-    "LinearScale": AnswerLinearScale,
-    "MultipleChoiceGrid": AnswerMultipleChoiceGrid,
-    "CheckboxGrid": AnswerCheckboxGrid,
-    "Date": AnswerDate,
-    "Time": AnswerTime,
-}
+// export const typeToAnswer: Record<QuestionType, React.FC<AnswerProps<any>>> = {
+//     "ShortAnswer": AnswerShortAnswer,
+//     "LongAnswer": AnswerLongAnswer,
+//     "MultipleChoice": AnswerMultipleChoice,
+//     "Checkbox": AnswerCheckbox,
+//     "Dropdown": AnswerDropdown,
+//     "LinearScale": AnswerLinearScale,
+//     "MultipleChoiceGrid": AnswerMultipleChoiceGrid,
+//     "CheckboxGrid": AnswerCheckboxGrid,
+//     "Date": AnswerDate,
+//     "Time": AnswerTime,
+// }
 
 export const typeToQuestion: Record<QuestionType, React.FC<QuestionProps<any, any>>> = {
     ShortAnswer: QuestionShortAnswer,
@@ -71,30 +72,30 @@ export const typeToQuestion: Record<QuestionType, React.FC<QuestionProps<any, an
     MultipleChoiceGrid: QuestionMultipleChoiceGrid,
 }
 
-export const renderEditQuestion = (question: Question, dispatch: Dispatch<Action>) => {
-    const props = {
-        key: question.id,
-        question,
-        dispatch,
-    } as EditQuestionProps<any>;
+// export const renderEditQuestion = (question: Question, dispatch: Dispatch<Action>) => {
+//     const props = {
+//         key: question.id,
+//         question,
+//         dispatch,
+//     } as EditQuestionProps<any>;
 
-    const Component = typeToEdit[question.type];
+//     const Component = typeToEdit[question.type];
 
-    return <Component {...props} />
-}
+//     return <Component {...props} />
+// }
 
 
-export const renderAnswerQuestion = (question: Question, answers: Answer[]) => {
-    const props = {
-        key: question.id,
-        question,
-        answers,
-    }
+// export const renderAnswerQuestion = (question: Question, answers: Answer[]) => {
+//     const props = {
+//         key: question.id,
+//         question,
+//         answers,
+//     }
 
-    const Component = typeToAnswer[question.type];
+//     const Component = typeToAnswer[question.type];
 
-    return <Component {...props} />
-}
+//     return <Component {...props} />
+// }
 
 
 export const renderQuestion = (question: Question, answer: Answer, dispatch: Dispatch<Action>) => {
@@ -110,89 +111,46 @@ export const renderQuestion = (question: Question, answer: Answer, dispatch: Dis
     return <Component {...props} />
 }
 
-export const resolveEmptyForm = () => {
+export const resolveEmptyForm = (): Form => {
     return {
         id: uuid(),
         createdAt: new Date().getTime(),
         updatedAt: new Date().getTime(),
+        active: false,
         title: '',
         description: '',
         questions: [],
-    } as Form
+    }
 }
 
+const typesWithSubquestions = ["MultipleChoiceGrid", "CheckboxGrid"];
 
-export const resolveEmptyAnswer = (question: Question) => {
-    switch (question.type) {
-        case "ShortAnswer":
-            return {
-                id: uuid(),
-                type: "ShortAnswer",
-                questionId: question.id,
-                answer: "",
-            }
-        case "LongAnswer":
-            return {
-                id: uuid(),
-                type: "LongAnswer",
-                questionId: question.id,
-                answer: "",
-            }
-        case "MultipleChoice":
-            return {
-                id: uuid(),
-                type: "MultipleChoice",
-                questionId: question.id,
-                answer: "",
-            }
-        case "Checkbox":
-            return {
-                id: uuid(),
-                type: "Checkbox",
-                questionId: question.id,
-                answer: [],
-            }
-        case "Dropdown":
-            return {
-                id: uuid(),
-                type: "Dropdown",
-                questionId: question.id,
-                answer: "",
-            }
-        case "LinearScale":
-            return {
-                id: uuid(),
-                type: "LinearScale",
-                questionId: question.id,
-                answer: question.min,
-            }
-        case "MultipleChoiceGrid":
-            return {
-                id: uuid(),
-                type: "MultipleChoiceGrid",
-                questionId: question.id,
-                answer: question.subQuestions.map(() => ""),
-            }
-        case "CheckboxGrid":
-            return {
-                id: uuid(),
-                type: "CheckboxGrid",
-                questionId: question.id,
-                answer: question.subQuestions.map(() => []),
-            }
-        case "Date":
-            return {
-                id: uuid(),
-                type: "Date",
-                questionId: question.id,
-                answer: "",
-            }
-        case "Time":
-            return {
-                id: uuid(),
-                type: "Time",
-                questionId: question.id,
-                answer: "",
-            }
+export const resolveEmptyAnswers = (questions: Question[]) => {
+    return Object.fromEntries(
+        questions.map(question => (
+            [
+                question.id,
+                typesWithSubquestions.includes(question.type)
+                    ? {}
+                    : ""
+            ]
+        ))
+    )
+}
+
+export const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
+
+
+export const joinJob = async (
+    jobId: string,
+    onProgressCallback: Function,
+    timeout: number = 250
+): Promise<void> => {
+    let job = await getJob(jobId);
+
+    while (job === JobStatus.Processing) {
+        onProgressCallback(job);
+        await sleep(timeout);
+        job = await getJob(jobId);
     }
 }

@@ -1,15 +1,8 @@
 import { buildUrl } from "build-url-ts"
-import { Form } from "./typings"
-
-export interface Job<T = any> {
-    id: string;
-    status: string;
-    error: boolean;
-    output?: T;
-}
+import { Form, FormAnalytics, FormSnapshot, FormView, Job, JobStatus, Metric, Question, QuestionView, Response, ResponseAnalytics, ResponseSnapshot } from "./typings"
+import { sleep } from "./utils";
 
 const DEFAULT_API_URL = 'http://localhost:5000';
-
 
 export const _loadApiUrl = () =>
     localStorage.getItem('apiUrl') || DEFAULT_API_URL;
@@ -18,7 +11,7 @@ export const _saveApiUrl = (apiUrl: string) =>
     localStorage.setItem('apiUrl', apiUrl);
 
 
-export const createForm = async (form: Form): Promise<boolean> => {
+export const createForm = async (form: Form): Promise<void> => {
     const url = buildUrl(_loadApiUrl(), {
         path: 'forms',
     });
@@ -34,9 +27,13 @@ export const createForm = async (form: Form): Promise<boolean> => {
     return await response.json();
 }
 
-export const getForms = async (): Promise<Form[]> => {
+export const getForms = async (active?: boolean, query?: string): Promise<FormView[]> => {
     const url = buildUrl(_loadApiUrl(), {
         path: 'forms',
+        queryParams: {
+            active: active !== undefined ? (active ? "True" : "False") : undefined,
+            query,
+        }
     });
 
     const response = await fetch(url);
@@ -44,7 +41,7 @@ export const getForms = async (): Promise<Form[]> => {
     return await response.json();
 }
 
-export const getForm = async (formId: string): Promise<Form> => {
+export const getForm = async (formId: string): Promise<FormSnapshot> => {
     const url = buildUrl(_loadApiUrl(), {
         path: `forms/${formId}`,
     });
@@ -54,9 +51,37 @@ export const getForm = async (formId: string): Promise<Form> => {
     return await response.json();
 }
 
-export const getJob = async (jobId: string) => {
+export const patchForm = async (formId: string, form: Partial<FormSnapshot>): Promise<void> => {
     const url = buildUrl(_loadApiUrl(), {
-        path: `jobs/${jobId}`,
+        path: `forms/${formId}`,
+    });
+
+    const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(form),
+    });
+
+    return await response.json();
+}
+
+export const deleteForm = async (formId: string): Promise<void> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `forms/${formId}`,
+    });
+
+    const response = await fetch(url, {
+        method: 'DELETE',
+    });
+
+    return await response.json();
+}
+
+export const getFormMetrics = async (formId: string): Promise<Metric[]> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `forms/${formId}/metrics`,
     });
 
     const response = await fetch(url);
@@ -64,7 +89,17 @@ export const getJob = async (jobId: string) => {
     return await response.json();
 }
 
-export const createResponse = async (formId: string, _response: object) => {
+export const getFormAnalytics = async (formId: string): Promise<FormAnalytics> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `forms/${formId}/analytics`,
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
+}
+
+export const createResponse = async (formId: string, _response: Response): Promise<void> => {
     const url = buildUrl(_loadApiUrl(), {
         path: `forms/${formId}/responses`,
     });
@@ -80,7 +115,7 @@ export const createResponse = async (formId: string, _response: object) => {
     return await response.json();
 }
 
-export const getResponses = async (formId: string) => {
+export const getResponses = async (formId: string): Promise<ResponseSnapshot> => {
     const url = buildUrl(_loadApiUrl(), {
         path: `forms/${formId}/responses`,
     });
@@ -90,21 +125,7 @@ export const getResponses = async (formId: string) => {
     return await response.json();
 }
 
-export const getKeywords = async (formId: string) => {
-    const url = buildUrl(_loadApiUrl(), {
-        path: `forms/${formId}/responses/keywords`,
-    });
-
-    const response = await fetch(url);
-
-    return await response.json();
-}
-
-export const getEmotions = async (formId: string) => { }
-
-export const getSummary = async (formId: string) => { }
-
-export const getResponse = async (formId: string, responseId: string) => {
+export const getResponse = async (formId: string, responseId: string): Promise<ResponseSnapshot> => {
     const url = buildUrl(_loadApiUrl(), {
         path: `forms/${formId}/responses/${responseId}`,
     });
@@ -114,26 +135,141 @@ export const getResponse = async (formId: string, responseId: string) => {
     return await response.json();
 }
 
-export const getResponseKeywords = async (formId: string, responseId: string) => { }
+export const patchResponse = async (formId: string, responseId: string, _response: Partial<ResponseSnapshot>): Promise<void> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `forms/${formId}/responses/${responseId}`,
+    });
 
-export const getResponseEmotions = async (formId: string, responseId: string) => { }
+    const response = await fetch(url, {
+        method: 'PATCH',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(_response),
+    });
 
-export const getResponseSummary = async (formId: string, responseId: string) => { }
+    return await response.json();
+}
 
-const sleep = (time: number) => new Promise(resolve => setTimeout(resolve, time));
+export const deleteResponse = async (formId: string, responseId: string): Promise<void> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `forms/${formId}/responses/${responseId}`,
+    });
 
-export const joinJob = async <T,>(
-    jobId: string,
-    onProgressCallback: Function,
-    timeout: number = 250
-): Promise<Job<T>> => {
-    let job = await getJob(jobId);
+    const response = await fetch(url, {
+        method: 'DELETE',
+    });
 
-    while (job.status === 'running') {
-        onProgressCallback(job);
-        await sleep(timeout);
-        job = await getJob(jobId);
-    }
+    return await response.json();
+}
 
-    return job;
+export const createResponseMetric = async (formId: string, responseId: string, metric: Metric): Promise<void> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `forms/${formId}/responses/${responseId}/metrics`,
+    });
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(metric),
+    });
+
+    return await response.json();
+}
+
+export const getResponseMetrics = async (formId: string, responseId: string): Promise<Metric[]> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `forms/${formId}/responses/${responseId}/metrics`,
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
+}
+
+export const getResponseAnalytics = async (formId: string, responseId: string): Promise<ResponseAnalytics> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `forms/${formId}/responses/${responseId}/analytics`,
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
+}
+
+export const moveQuestion = async (formId: string, questionId: string, direction: 'up' | 'down', amount: number = 1): Promise<void> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `forms/${formId}/questions/${questionId}/move`,
+        queryParams: {
+            direction,
+            amount,
+        }
+    });
+
+    const response = await fetch(url, {
+        method: 'POST',
+    });
+
+    return await response.json();
+}
+
+export const createQuestion = async (question: Question): Promise<void> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `questions`,
+    });
+
+    const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(question),
+    });
+
+    return await response.json();
+}
+
+export const getQuestions = async (query?: string): Promise<QuestionView[]> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `questions`,
+        queryParams: {
+            query,
+        }
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
+}
+
+export const getQuestion = async (questionId: string): Promise<Question> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `questions/${questionId}`,
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
+}
+
+export const getTrackingId = async (trackingId: string): Promise<Metric[]> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `tracking/${trackingId}`,
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
+}
+
+export const getJob = async (jobId: string): Promise<JobStatus> => {
+    const url = buildUrl(_loadApiUrl(), {
+        path: `jobs/${jobId}`,
+    });
+
+    const response = await fetch(url);
+
+    return await response.json();
 }

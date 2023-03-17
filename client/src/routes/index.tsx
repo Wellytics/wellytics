@@ -1,53 +1,46 @@
 import React, { useCallback, useEffect, useState } from 'react'
-import { useTitle } from '../hooks/useTitle'
-import { Button, Typography } from 'antd'
+import { FormView } from '../typings';
 import { useNavigate } from 'react-router-dom';
-import { Form } from '../typings';
 import { getForms } from '../api';
+import { Button } from 'antd';
 
-const { Title } = Typography;
+export const Root = () => {
+    const navigate = useNavigate();
 
-export const Index = () => {
-  const [title, setTitle] = useTitle("Brothers on The Rise")
+    const [ready, setReady] = useState(false);
+    const [formViews, setFormViews] = useState<FormView[]>([]);
 
-  const navigate = useNavigate();
+    const initialize = useCallback(async () => {
+        const formViews = await getForms();
+        setFormViews(formViews);
+        setReady(true);
+    }, [setReady, setFormViews]);
 
-  const [ready, setReady] = useState(false);
-  const [forms, setForms] = useState<Form[]>([]);
+    useEffect(() => { if (!ready) initialize() }, [ready, initialize]);
 
-  const initialize = useCallback(async () => {
-    const forms = await getForms();
-    setForms(forms);
-    setReady(true);
-  }, [setForms]);
+    const onClickDashboard = useCallback(() => {
+        navigate('/_');
+    }, [navigate]);
 
-  useEffect(() => { if (!ready) initialize() }, [ready, initialize]);
+    const onClickForm = useCallback((formId: string) => {
+        navigate(`/forms/${formId}`);
+    }, [navigate]);
 
-  const onClickDashboard = useCallback(() => {
-    navigate('/_');
-  }, [navigate])
+    if (!ready) return <div>loading...</div>;
 
-  const onClickForm = useCallback((formId: string) => {
-    navigate(`/forms/${formId}`);
-  }, [navigate])
+    return (
+        <div>
+            <Button onClick={onClickDashboard}>
+                Dashboard
+            </Button>
 
-  return (
-    <div>
-      <Title>
-        {title}
-      </Title>
-
-      <Button onClick={onClickDashboard}>
-        Dashboard
-      </Button>
-
-      <div>
-        {forms.map((form) => (
-          <Button key={form.id} onClick={() => onClickForm(form.id)}>
-            {form.title}
-          </Button>
-        ))}
-      </div>
-    </div>
-  )
+            <div>
+                {formViews.map((formView) => (
+                    <Button key={formView.id} onClick={() => onClickForm(formView.id)}>
+                        {formView.title}
+                    </Button>
+                ))}
+            </div>
+        </div>
+    )
 }

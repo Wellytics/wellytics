@@ -18,6 +18,7 @@ def forms():
         form = request.get_json()
         form = Form(**form)
         api.create_form(form)
+        return jsonify(True)
 
     # NOTE: Should have `active` as a query param
     # TODO: Add `query` as a query param
@@ -44,9 +45,11 @@ def form(form_id: str):
     def patch_form():
         form = request.get_json()
         api.patch_form(form_id, form)
+        return jsonify(True)
 
     def delete_form():
         api.delete_form(form_id)
+        return jsonify(True)
 
     if request.method == "GET":
         return get_form()
@@ -78,7 +81,8 @@ def form_responses(form_id: str):
     def create_response():
         response = request.get_json()
         response = Response(**response)
-        api.create_response(form_id, response)
+        api.create_response(response)
+        return jsonify(True)
 
     def get_responses():
         responses = api.get_responses(form_id)
@@ -103,9 +107,11 @@ def form_response(form_id: str, response_id: str):
     def patch_response():
         response = request.get_json()
         api.patch_response(form_id, response_id, response)
+        return jsonify(True)
 
     def delete_response():
         api.delete_response(form_id, response_id)
+        return jsonify(True)
 
     if request.method == "GET":
         return get_response()
@@ -128,6 +134,7 @@ def form_response_metrics(form_id: str, response_id: str):
             api.create_metric(metric)
             metric_id = metric.id
         api.add_metric_to_response(form_id, response_id, metric_id)
+        return jsonify(True)
 
     def get_response_metrics():
         metrics = api.get_response_metrics(form_id, response_id)
@@ -162,6 +169,8 @@ def form_question_move(form_id: str, question_id: str):
     elif direction == "down":
         api.move_question_down(form_id, question_id, amount)
 
+    return jsonify(True)
+
 
 @flask_app.route("/questions", methods=["GET", "POST"])
 def questions():
@@ -174,6 +183,7 @@ def questions():
             api.create_question(question)
             question_id = question.id
         api.add_question_to_form(question.form_id, question_id)
+        return jsonify(True)
 
     # TODO: Add `query` as a query param
     def get_questions():

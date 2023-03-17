@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 from pydantic import BaseModel
 
 ResponseAnalyticsCollection = "responseAnalyses"
@@ -15,6 +15,15 @@ class JobStatus:
 class JobType:
     FormAnalytics = "FormAnalytics"
     ResponseAnalytics = "ResponseAnalytics"
+
+
+class Job(BaseModel):
+    id: str
+    type: str
+    status: str
+    payload: Any
+    result: Optional[Any]
+    callback: Optional[Any]
 
 
 class Question(BaseModel):

@@ -1,19 +1,17 @@
 import React, { FC } from 'react'
-import { DateAnswer, DateQuestion, QuestionProps } from '../../typings'
+import { DateQuestion, QuestionProps } from '../../typings'
 import { DatePicker, Typography } from 'antd'
 import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionDate: FC<QuestionProps<DateQuestion, DateAnswer>> = ({ question: _question, answer, dispatch }) => {
-  const { onChangeAnswer } = useAnswer(answer.id, dispatch)
-
-  const { question } = _question;
+export const QuestionDate: FC<QuestionProps<DateQuestion, string>> = ({ question, answer, dispatch }) => {
+  const { onChange } = useAnswer(question.id, dispatch)
 
   return (
     <div>
-      <Title level={4}>{question}</Title>
-      <DatePicker onChange={(v) => onChangeAnswer(v?.toISOString())} />
+      <Title level={4}>{question.question}</Title>
+      <DatePicker onChange={(v) => onChange(v?.toISOString())} />
     </div>
   )
 }

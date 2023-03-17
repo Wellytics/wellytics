@@ -1,19 +1,17 @@
 import React, { FC } from 'react'
-import { QuestionProps, TimeAnswer, TimeQuestion } from '../../typings'
+import { QuestionProps, TimeQuestion } from '../../typings'
 import { TimePicker, Typography } from 'antd'
 import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionTime: FC<QuestionProps<TimeQuestion, TimeAnswer>> = ({ question: _question, answer, dispatch }) => {
-  const { onChangeAnswer } = useAnswer(answer.id, dispatch)
-
-  const { question } = _question;
+export const QuestionTime: FC<QuestionProps<TimeQuestion, string>> = ({ question, answer, dispatch }) => {
+  const { onChange } = useAnswer(question.id, dispatch)
 
   return (
     <div>
-      <Title level={4}>{question}</Title>
-      <TimePicker onChange={(e) => onChangeAnswer(e?.toISOString())} />
+      <Title level={4}>{question.question}</Title>
+      <TimePicker onChange={(e) => onChange(e?.toISOString())} />
     </div>
   )
 }
