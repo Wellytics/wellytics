@@ -5,7 +5,7 @@ import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionMultipleChoice: FC<QuestionProps<MultipleChoiceQuestion, string>> = ({ question, answer, dispatch }) => {
+export const QuestionMultipleChoice: FC<QuestionProps<MultipleChoiceQuestion>> = ({ question, dispatch }) => {
   const { onChange } = useAnswer(question.id, dispatch)
 
   return (

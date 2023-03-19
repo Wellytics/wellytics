@@ -5,7 +5,7 @@ import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionCheckbox: FC<QuestionProps<CheckboxQuestion, string>> = ({ question, answer, dispatch }) => {
+export const QuestionCheckbox: FC<QuestionProps<CheckboxQuestion>> = ({ question, dispatch }) => {
   const { onChange } = useAnswer(question.id, dispatch)
 
   return (

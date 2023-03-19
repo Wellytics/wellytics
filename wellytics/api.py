@@ -209,14 +209,18 @@ def get_question(question_id: str) -> Question:
     return Question(**question_dict)
 
 
-def get_forms(active: bool = True) -> List[FormView]:
+def get_forms(only_active: bool = True) -> List[FormView]:
+    forms_collection_ref = firestore.collection("forms")
+
+    if only_active:
+        forms_collection_ref = forms_collection_ref.where("active", "==", True)
+
     form_view_dicts = _map(
         lambda x: x.to_dict(),
         (
-            firestore.collection("forms")
-            .where("active", "==", active)
-            .select(["active", "createdAt", "updatedAt", "id", "title", "description"])
-            .stream()
+            forms_collection_ref.select(
+                ["active", "createdAt", "updatedAt", "id", "title", "description"]
+            ).stream()
         ),
     )
     return _map(lambda x: FormView(**x), form_view_dicts)

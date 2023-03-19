@@ -59,7 +59,7 @@ import { getJob } from "./api";
 //     "Time": AnswerTime,
 // }
 
-export const typeToQuestion: Record<QuestionType, React.FC<QuestionProps<any, any>>> = {
+export const typeToQuestion: Record<QuestionType, React.FC<QuestionProps<any>>> = {
     ShortAnswer: QuestionShortAnswer,
     LongAnswer: QuestionLongAnswer,
     MultipleChoice: QuestionMultipleChoice,
@@ -98,13 +98,12 @@ export const typeToQuestion: Record<QuestionType, React.FC<QuestionProps<any, an
 // }
 
 
-export const renderQuestion = (question: Question, answer: Answer, dispatch: Dispatch<Action>) => {
+export const renderQuestion = (question: Question, dispatch: Dispatch<Action>) => {
     const props = {
         key: question.id,
         question,
-        answer,
         dispatch,
-    } as QuestionProps<any, any>
+    } as QuestionProps<any>
 
     const Component = typeToQuestion[question.type]
 

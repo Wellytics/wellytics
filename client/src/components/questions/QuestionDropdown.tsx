@@ -5,7 +5,7 @@ import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionDropdown: FC<QuestionProps<DropdownQuestion, string>> = ({ question, answer, dispatch }) => {
+export const QuestionDropdown: FC<QuestionProps<DropdownQuestion>> = ({ question, dispatch }) => {
   const { onChange } = useAnswer(question.id, dispatch)
 
   return (

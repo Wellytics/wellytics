@@ -75,7 +75,7 @@ export const Form = () => {
             <Text>{form.description}</Text>
 
             <div>
-                {form.questions.map((question) => renderQuestion(question, answers[question.id], dispatch))}
+                {form.questions.map((question) => renderQuestion(question, dispatch))}
             </div>
 
             <Button onClick={onClickSubmit}>

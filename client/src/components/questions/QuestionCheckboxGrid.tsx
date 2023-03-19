@@ -6,10 +6,9 @@ import { useAnswer } from './base';
 const { Title } = Typography;
 
 export const QuestionCheckboxGrid: FC<QuestionProps<
-  CheckboxGridQuestion,
-  Record<string, string>
->> = ({ question, answer, dispatch }) => {
-  const { onChangeInner } = useAnswer(answer.id, dispatch)
+  CheckboxGridQuestion
+>> = ({ question, dispatch }) => {
+  const { onChangeInner } = useAnswer(question.id, dispatch)
 
   return (
     <div>

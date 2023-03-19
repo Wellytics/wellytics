@@ -5,8 +5,8 @@ import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionMultipleChoiceGrid: FC<QuestionProps<MultipleChoiceGridQuestion, Record<string, string>>> = ({ question, answer, dispatch }) => {
-  const { onChangeInner } = useAnswer(answer.id, dispatch)
+export const QuestionMultipleChoiceGrid: FC<QuestionProps<MultipleChoiceGridQuestion>> = ({ question, dispatch }) => {
+  const { onChangeInner } = useAnswer(question.id, dispatch)
 
   return (
     <div>

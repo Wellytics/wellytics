@@ -27,11 +27,11 @@ export const createForm = async (form: Form): Promise<void> => {
     return await response.json();
 }
 
-export const getForms = async (active?: boolean, query?: string): Promise<FormView[]> => {
+export const getForms = async (onlyActive?: boolean, query?: string): Promise<FormView[]> => {
     const url = buildUrl(_loadApiUrl(), {
         path: 'forms',
         queryParams: {
-            active: active !== undefined ? (active ? "True" : "False") : undefined,
+            onlyActive: onlyActive !== undefined ? (onlyActive ? "True" : "False") : undefined,
             query,
         }
     });

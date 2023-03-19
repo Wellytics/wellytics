@@ -24,8 +24,8 @@ def forms():
     # TODO: Add `query` as a query param
     def get_forms():
         query = request.args.get("query", type=str, default="")
-        active = request.args.get("active", type=bool, default=True)
-        forms = api.get_forms(active=active)
+        only_active = request.args.get("onlyActive", type=bool, default=True)
+        forms = api.get_forms(only_active=only_active)
         forms = _map(lambda form: form.dict(), forms)
         return jsonify(forms)
 

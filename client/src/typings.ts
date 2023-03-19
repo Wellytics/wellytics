@@ -214,9 +214,8 @@ export interface EditQuestionProps<T = Question> {
     dispatch: Dispatch<Action>;
 }
 
-export interface QuestionProps<T = Question, U = Answer> {
+export interface QuestionProps<T = Question> {
     question: T;
-    answer: U;
     dispatch: Dispatch<Action>;
 }
 

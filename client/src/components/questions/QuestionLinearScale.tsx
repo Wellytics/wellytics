@@ -5,7 +5,7 @@ import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionLinearScale: FC<QuestionProps<LinearScaleQuestion, string>> = ({ question, answer, dispatch }) => {
+export const QuestionLinearScale: FC<QuestionProps<LinearScaleQuestion>> = ({ question, dispatch }) => {
   const { onChange } = useAnswer(question.id, dispatch)
 
   return (

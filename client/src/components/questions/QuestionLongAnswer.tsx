@@ -5,7 +5,7 @@ import { useAnswer } from './base';
 
 const { Title } = Typography;
 
-export const QuestionLongAnswer: FC<QuestionProps<LongAnswerQuestion, string>> = ({ question, answer, dispatch }) => {
+export const QuestionLongAnswer: FC<QuestionProps<LongAnswerQuestion>> = ({ question, dispatch }) => {
   const { onChange } = useAnswer(question.id, dispatch)
 
   return (
