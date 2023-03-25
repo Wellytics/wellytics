@@ -7,13 +7,11 @@ import { Root } from './routes';
 import { Form } from './routes/forms_id';
 import { DashboardRoot } from './routes/_';
 import { DashboardAuth } from './routes/_/auth';
-import { DashboardForms } from './routes/_/forms';
 import { DashboardForm } from './routes/_/forms_id';
 import { DashboardFormEdit } from './routes/_/forms_edit';
 import { DashboardFormQuestion } from './routes/_/forms_questions_id';
 import { DashboardFormResponse } from './routes/_/forms_responses_id';
 import { DashboardQuestion } from './routes/_/questions_id';
-import { DashboardQuestions } from './routes/_/questions';
 import { DashboardQuestionEdit } from './routes/_/questions_edit';
 import { DashboardMetrics } from './routes/_/metrics';
 import { DashboardMetric } from './routes/_/metrics_id';
@@ -41,10 +39,6 @@ const router = createHashRouter([
     element: <DashboardAuth />
   },
   {
-    path: "_/forms",
-    element: <DashboardForms />
-  },
-  {
     path: "_/forms/:formId",
     element: <DashboardForm />,
     children: [
@@ -61,10 +55,6 @@ const router = createHashRouter([
         element: <DashboardFormResponse />
       },
     ]
-  },
-  {
-    path: "_/questions",
-    element: <DashboardQuestions />
   },
   {
     path: "_/questions/:questionId",

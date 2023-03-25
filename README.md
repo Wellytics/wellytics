@@ -1,5 +1,10 @@
 # Welcome to Wellytics
 
+<!-- Inserts the image ./assets/dashboard.png centered -->
+<p align="center">
+  <img src="./assets/dashboard.png" alt="Wellytics Dashboard" />
+</p>
+
 Wellytics `work-in-progress` is a natural language processing (NLP) platform designed to analyze survey responses using machine learning algorithms. Our platform offers three key features: emotion analysis, keyword extraction, and metrics regressions. With Wellytics, you can quickly and easily analyze your survey responses to gain valuable insights into target audience.
 
 This project was originally made as a Minerva University Cornerstone Civic Project (CCP) for the non-profit organization Brothers on The Rise as mechanism to quantify the impact their community activities has.

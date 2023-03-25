@@ -1,10 +1,11 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { useNavigate } from 'react-router-dom'
-import { FormView, QuestionView } from '../../typings';
-import { getForms, getQuestions } from '../../api';
-import { Button, Typography } from 'antd';
+import React, { useCallback, useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { FormView, QuestionView } from "../../typings";
+import { getForms, getQuestions } from "../../api";
+import { Breadcrumb, Button, Card, Layout, Space, Typography } from "antd";
 
-const { Title } = Typography;
+const { Content } = Layout;
+const { Title, Text } = Typography;
 
 export const DashboardRoot = () => {
   const navigate = useNavigate();
@@ -16,7 +17,7 @@ export const DashboardRoot = () => {
   const initialize = useCallback(async () => {
     const [formViews, questionViews] = await Promise.all([
       getForms(false),
-      getQuestions()
+      getQuestions(),
     ]);
 
     setFormViews(formViews);
@@ -24,43 +25,93 @@ export const DashboardRoot = () => {
     setReady(true);
   }, [setReady, setFormViews, setQuestionViews]);
 
-  useEffect(() => { if (!ready) initialize() }, [ready, initialize]);
+  useEffect(() => {
+    if (!ready) initialize();
+  }, [ready, initialize]);
+
+  const onClickForm = useCallback(
+    (formId: string) => {
+      navigate(`/_/forms/${formId}`);
+    },
+    [navigate]
+  );
+
+  const onClickQuestion = useCallback(
+    (questionId: string) => {
+      navigate(`/_/questions/${questionId}`);
+    },
+    [navigate]
+  );
+
+  const onClickMetrics = useCallback(() => {
+    navigate(`/_/metrics`);
+  }, [navigate]);
+
+  const onClickTracking = useCallback(() => {
+    navigate(`/_/tracking`);
+  }, [navigate]);
 
   if (!ready) return <div>loading...</div>;
 
   return (
-    <div>
-      <Title>Forms</Title>
+    <Layout className="h-full" style={{ padding: "0 50px", overflow: "auto" }}>
+      <Breadcrumb style={{ margin: "16px 0" }}>
+        <Breadcrumb.Item>Dashboard</Breadcrumb.Item>
+      </Breadcrumb>
 
-      <div>
-        {formViews.map((formView) => (
-          <Button key={formView.id}>
-            {formView.title}
-          </Button>
-        ))}
-      </div>
+      <Content style={{ paddingBottom: "50px" }}>
+        <Space direction="vertical" className="w-full">
+          <Title>Forms</Title>
 
-      <Title>Questions</Title>
+          <Space wrap direction="horizontal">
+            {formViews.map((formView) => (
+              <Card
+                title={formView.title}
+                extra={
+                  <Button type="link" onClick={() => onClickForm(formView.id)}>
+                    Go
+                  </Button>
+                }
+                style={{ width: 300 }}
+              >
+                <Text>{formView.description}</Text>
+              </Card>
+            ))}
+          </Space>
 
-      <div>
-        {questionViews.map((questionView) => (
-          <Button key={questionView.id}>
-            {questionView.question}
-          </Button>
-        ))}
-      </div>
+          <Title>Questions</Title>
 
-      <Title>Metrics</Title>
+          <Space wrap direction="horizontal">
+            {questionViews.map((questionView) => (
+              <Card
+                title={questionView.question}
+                extra={
+                  <Button
+                    type="link"
+                    onClick={() => onClickQuestion(questionView.id)}
+                  >
+                    Go
+                  </Button>
+                }
+                style={{ width: 300 }}
+              >
+                <Text>
+                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
+                  Quisquam quaerat pariatur corporis.
+                </Text>
+              </Card>
+            ))}
+          </Space>
 
-      <Button>
-        Go
-      </Button>
+          <Title>Metrics</Title>
 
-      <Title>Tracking</Title>
+          <Button type="link" onClick={onClickMetrics}>Go</Button>
 
-      <Button>
-        Go
-      </Button>
-    </div>
-  )
-}
+          <Title>Tracking</Title>
+
+          <Button type="link" onClick={onClickTracking}>Go</Button>
+        </Space>
+      </Content>
+    </Layout>
+  );
+};

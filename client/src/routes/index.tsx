@@ -1,46 +1,73 @@
-import React, { useCallback, useEffect, useState } from 'react'
-import { FormView } from '../typings';
-import { useNavigate } from 'react-router-dom';
-import { getForms } from '../api';
-import { Button } from 'antd';
+import React, { useCallback, useEffect, useState } from "react";
+import { FormView } from "../typings";
+import { useNavigate } from "react-router-dom";
+import { getForms } from "../api";
+import { Breadcrumb, Button, Card, Layout, Space, Typography } from "antd";
+
+const { Content, Footer } = Layout;
+const { Title, Text } = Typography;
 
 export const Root = () => {
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const [ready, setReady] = useState(false);
-    const [formViews, setFormViews] = useState<FormView[]>([]);
+  const [ready, setReady] = useState(false);
+  const [formViews, setFormViews] = useState<FormView[]>([]);
 
-    const initialize = useCallback(async () => {
-        const formViews = await getForms();
-        setFormViews(formViews);
-        setReady(true);
-    }, [setReady, setFormViews]);
+  const initialize = useCallback(async () => {
+    const formViews = await getForms();
+    setFormViews(formViews);
+    setReady(true);
+  }, [setReady, setFormViews]);
 
-    useEffect(() => { if (!ready) initialize() }, [ready, initialize]);
+  useEffect(() => {
+    if (!ready) initialize();
+  }, [ready, initialize]);
 
-    const onClickDashboard = useCallback(() => {
-        navigate('/_');
-    }, [navigate]);
+  const onClickDashboard = useCallback(() => {
+    navigate("/_");
+  }, [navigate]);
 
-    const onClickForm = useCallback((formId: string) => {
-        navigate(`/forms/${formId}`);
-    }, [navigate]);
+  const onClickForm = useCallback(
+    (formId: string) => {
+      navigate(`/forms/${formId}`);
+    },
+    [navigate]
+  );
 
-    if (!ready) return <div>loading...</div>;
+  if (!ready) return <div>loading...</div>;
 
-    return (
-        <div>
-            <Button onClick={onClickDashboard}>
-                Dashboard
-            </Button>
+  return (
+    <Layout className="h-full" style={{ padding: "0 50px", overflow: "auto" }}>
+      <Breadcrumb style={{ margin: "16px 0" }}>
+        <Breadcrumb.Item>Forms</Breadcrumb.Item>
+      </Breadcrumb>
 
-            <div>
-                {formViews.map((formView) => (
-                    <Button key={formView.id} onClick={() => onClickForm(formView.id)}>
-                        {formView.title}
-                    </Button>
-                ))}
-            </div>
-        </div>
-    )
-}
+      <Content style={{ paddingBottom: "50px" }}>
+        <Space direction="vertical" className="w-full">
+          <Title>Welcome to Brothers on The Rise's Wellytics platform!</Title>
+
+          <Space wrap direction="horizontal">
+            {formViews.map((formView) => (
+              <Card
+                title={formView.title}
+                extra={
+                  <Button type="link" onClick={() => onClickForm(formView.id)}>
+                    Go
+                  </Button>
+                }
+                style={{ width: 300 }}
+              >
+                <Text>{formView.description}</Text>
+              </Card>
+            ))}
+          </Space>
+        </Space>
+      </Content>
+      <Footer style={{ textAlign: "center" }}>
+        <Button type="link" onClick={onClickDashboard}>
+          Go to dashboard
+        </Button>
+      </Footer>
+    </Layout>
+  );
+};

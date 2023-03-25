@@ -115,7 +115,7 @@ export const createResponse = async (formId: string, _response: Response): Promi
     return await response.json();
 }
 
-export const getResponses = async (formId: string): Promise<ResponseSnapshot> => {
+export const getResponses = async (formId: string): Promise<ResponseSnapshot[]> => {
     const url = buildUrl(_loadApiUrl(), {
         path: `forms/${formId}/responses`,
     });
