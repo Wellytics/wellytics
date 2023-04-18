@@ -1,6 +1,7 @@
 import threading
 import time
 
+from os.path import dirname, join
 from queue import Queue
 from typing import Any, Dict, List, Optional
 from pydantic import BaseModel
@@ -19,14 +20,19 @@ from wellytics.models import (
 )
 from wellytics.utils import _find
 
-_keywords_model = "yanekyuk/bert-uncased-keyword-extractor"
-_emotions_model = "joeddav/distilbert-base-uncased-go-emotions-student"
+_keywords_model = "./bert-uncased-keyword-extractor"
+_emotions_model = "./distilbert-base-uncased-go-emotions-student"
 
-_keywords_pipeline = pipeline("ner", model=_keywords_model)
+_keywords_pipeline = pipeline(
+    "ner",
+    model=_keywords_model,
+    tokenizer=_keywords_model,
+)
 
 _emotions_pipeline = pipeline(
     "text-classification",
     model=_emotions_model,
+    tokenizer=_emotions_model,
     return_all_scores=True,
 )
 
@@ -113,7 +119,6 @@ def _get_emotions(text: str):
     outputs = [Emotion(**output) for output in outputs]
 
     return outputs
-
 
 
 class OrchestratorThread(threading.Thread):

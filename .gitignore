@@ -1,5 +1,7 @@
 credentials.json
 gitignore/
+bert-uncased-keyword-extractor/
+distilbert-base-uncased-go-emotions-student/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

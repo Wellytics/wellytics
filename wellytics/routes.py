@@ -1,6 +1,9 @@
+import os
+
 import wellytics.api as api
 
 from flask import Flask, request, jsonify
+
 from flask_cors import CORS
 
 from wellytics.models import Form, Metric, Question, Response
@@ -222,4 +225,8 @@ def job(job_id: str):
 
 
 if __name__ == "__main__":
-    flask_app.run(threaded=True)
+    flask_app.run(
+        debug=False,
+        host="0.0.0.0",
+        port=int(os.environ.get("PORT", 5000)),
+    )
