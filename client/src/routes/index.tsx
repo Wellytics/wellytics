@@ -3,6 +3,7 @@ import { FormView } from "../typings";
 import { useNavigate } from "react-router-dom";
 import { getForms } from "../api";
 import { Breadcrumb, Button, Card, Layout, Space, Typography } from "antd";
+import { LoadingScreen } from "../components/LoadingScreen";
 
 const { Content, Footer } = Layout;
 const { Title, Text } = Typography;
@@ -34,7 +35,7 @@ export const Root = () => {
     [navigate]
   );
 
-  if (!ready) return <div>loading...</div>;
+  if (!ready) return <LoadingScreen />;
 
   return (
     <Layout className="h-full" style={{ padding: "0 50px", overflow: "auto" }}>

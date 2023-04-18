@@ -7,6 +7,7 @@ import ParentSize from "@visx/responsive/lib/components/ParentSize";
 import { Radar } from "../../components/Radar";
 import { Streamgraph } from "../../components/Streamgraph";
 import { Bar } from "../../components/BarStack";
+import { LoadingScreen } from "../../components/LoadingScreen";
 
 const { Title, Text } = Typography;
 
@@ -39,7 +40,7 @@ export const DashboardFormQuestion = () => {
       .map((answer) => JSON.stringify(answer));
   }, [responses, questionId]);
 
-  if (!ready) return <div>loading...</div>;
+  if (!ready) return <LoadingScreen />;
   if (!question) return <div>not found</div>;
   if (!responses) return <div>not found</div>;
 

@@ -30,13 +30,13 @@ export type BarStackProps = {
   width: number;
   height: number;
   margin?: { top: number; right: number; bottom: number; left: number };
-  events?: boolean;
 };
 
 const purple1 = "#6c5efb";
 const purple2 = "#c998ff";
-export const purple3 = "#a44afe";
-export const background = "#eaedff";
+const purple3 = "#a44afe";
+const background = "#eaedff";
+
 const defaultMargin = { top: 40, right: 0, bottom: 0, left: 0 };
 const tooltipStyles = {
   ...defaultStyles,
@@ -80,12 +80,15 @@ const colorScale = scaleOrdinal<CityName, string>({
 
 let tooltipTimeout: number;
 
-export function Bar({
-  width,
-  height,
-  events = false,
-  margin = defaultMargin,
-}: BarStackProps) {
+// x
+// getX
+// scaleX
+
+// y
+// getY
+// scaleY
+
+export function Bar({ width, height, margin = defaultMargin }: BarStackProps) {
   const {
     tooltipOpen,
     tooltipLeft,
@@ -96,9 +99,6 @@ export function Bar({
   } = useTooltip<TooltipData>();
 
   const { containerRef, TooltipInPortal } = useTooltipInPortal({
-    // TooltipInPortal is rendered in a separate child of <body /> and positioned
-    // with page coordinates which should be updated on scroll. consider using
-    // Tooltip or TooltipWithBounds if you don't need to render inside a Portal
     scroll: true,
   });
 
@@ -151,9 +151,6 @@ export function Bar({
                     height={bar.height}
                     width={bar.width}
                     fill={bar.color}
-                    onClick={() => {
-                      if (events) alert(`clicked: ${JSON.stringify(bar)}`);
-                    }}
                     onMouseLeave={() => {
                       tooltipTimeout = window.setTimeout(() => {
                         hideTooltip();
@@ -161,9 +158,6 @@ export function Bar({
                     }}
                     onMouseMove={(event) => {
                       if (tooltipTimeout) clearTimeout(tooltipTimeout);
-                      // TooltipInPortal expects coordinates to be relative to containerRef
-                      // localPoint returns coordinates relative to the nearest SVG, which
-                      // is what containerRef is set to in this example.
                       const eventSvgCoords = localPoint(event);
                       const left = bar.x + bar.width / 2;
                       showTooltip({

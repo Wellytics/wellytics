@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { FormSnapshot, ResponseSnapshot } from "../../typings";
 import { getForm, getResponse } from "../../api";
 import { List, Space, Typography } from "antd";
+import { LoadingScreen } from "../../components/LoadingScreen";
 
 const { Title, Text } = Typography;
 
@@ -37,7 +38,7 @@ export const DashboardFormResponse = () => {
     }));
   }, [response, form]);
 
-  if (!ready) return <div>loading...</div>;
+  if (!ready) return <LoadingScreen />;
   if (!response) return <div>not found</div>;
   if (!form) return <div>not found</div>;
 

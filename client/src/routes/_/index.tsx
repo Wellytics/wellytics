@@ -3,9 +3,28 @@ import { useNavigate } from "react-router-dom";
 import { FormView, QuestionView } from "../../typings";
 import { getForms, getQuestions } from "../../api";
 import { Breadcrumb, Button, Card, Layout, Space, Typography } from "antd";
+import { LoadingScreen } from "../../components/LoadingScreen";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
+
+const buildFormDescription = (formView: FormView) => {
+  const { createdAt, updatedAt, description } = formView;
+
+  const createdAtDate = new Date(createdAt).toLocaleString();
+  const updatedAtDate = new Date(updatedAt).toLocaleString();
+
+  return `Created at ${createdAtDate} and last updated at ${updatedAtDate}. ${description}`;
+};
+
+const buildQuestionDescription = (questionView: QuestionView) => {
+  const { createdAt, updatedAt } = questionView;
+
+  const createdAtDate = new Date(createdAt).toLocaleString();
+  const updatedAtDate = new Date(updatedAt).toLocaleString();
+
+  return `Created at ${createdAtDate} and last updated at ${updatedAtDate}.`;
+};
 
 export const DashboardRoot = () => {
   const navigate = useNavigate();
@@ -13,6 +32,10 @@ export const DashboardRoot = () => {
   const [ready, setReady] = useState(false);
   const [formViews, setFormViews] = useState<FormView[]>([]);
   const [questionViews, setQuestionViews] = useState<QuestionView[]>([]);
+  const [formDescriptions, setFormDescriptions] = useState<string[]>([]);
+  const [questionDescriptions, setQuestionDescriptions] = useState<string[]>(
+    []
+  );
 
   const initialize = useCallback(async () => {
     const [formViews, questionViews] = await Promise.all([
@@ -20,8 +43,13 @@ export const DashboardRoot = () => {
       getQuestions(),
     ]);
 
+    const formDescriptions = formViews.map(buildFormDescription);
+    const questionDescriptions = questionViews.map(buildQuestionDescription);
+
     setFormViews(formViews);
     setQuestionViews(questionViews);
+    setFormDescriptions(formDescriptions);
+    setQuestionDescriptions(questionDescriptions);
     setReady(true);
   }, [setReady, setFormViews, setQuestionViews]);
 
@@ -51,7 +79,7 @@ export const DashboardRoot = () => {
     navigate(`/_/tracking`);
   }, [navigate]);
 
-  if (!ready) return <div>loading...</div>;
+  if (!ready) return <LoadingScreen />;
 
   return (
     <Layout className="h-full" style={{ padding: "0 50px", overflow: "auto" }}>
@@ -63,8 +91,15 @@ export const DashboardRoot = () => {
         <Space direction="vertical" className="w-full">
           <Title>Forms</Title>
 
-          <Space wrap direction="horizontal">
-            {formViews.map((formView) => (
+          <Space
+            style={{
+              maxHeight: 500,
+              overflow: "auto",
+            }}
+            wrap
+            direction="horizontal"
+          >
+            {formViews.map((formView, i) => (
               <Card
                 title={formView.title}
                 extra={
@@ -74,15 +109,22 @@ export const DashboardRoot = () => {
                 }
                 style={{ width: 300 }}
               >
-                <Text>{formView.description}</Text>
+                <Text>{formDescriptions[i]}</Text>
               </Card>
             ))}
           </Space>
 
           <Title>Questions</Title>
 
-          <Space wrap direction="horizontal">
-            {questionViews.map((questionView) => (
+          <Space
+            style={{
+              maxHeight: 500,
+              overflow: "auto",
+            }}
+            wrap
+            direction="horizontal"
+          >
+            {questionViews.map((questionView, i) => (
               <Card
                 title={questionView.question}
                 extra={
@@ -95,21 +137,22 @@ export const DashboardRoot = () => {
                 }
                 style={{ width: 300 }}
               >
-                <Text>
-                  Lorem ipsum dolor sit amet, consectetur adipisicing elit.
-                  Quisquam quaerat pariatur corporis.
-                </Text>
+                <Text>{questionDescriptions[i]}</Text>
               </Card>
             ))}
           </Space>
 
           <Title>Metrics</Title>
 
-          <Button type="link" onClick={onClickMetrics}>Go</Button>
+          <Button type="link" onClick={onClickMetrics}>
+            Go
+          </Button>
 
           <Title>Tracking</Title>
 
-          <Button type="link" onClick={onClickTracking}>Go</Button>
+          <Button type="link" onClick={onClickTracking}>
+            Go
+          </Button>
         </Space>
       </Content>
     </Layout>

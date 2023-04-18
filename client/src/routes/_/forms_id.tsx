@@ -1,7 +1,18 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate, useOutlet, useParams } from "react-router-dom";
-import { getForm, getResponses } from "../../api";
-import { FormSnapshot, ResponseSnapshot } from "../../typings";
+import {
+  getForm,
+  getFormAnalytics,
+  getFormMetrics,
+  getResponses,
+} from "../../api";
+import {
+  Emotion,
+  FormAnalytics,
+  FormSnapshot,
+  Metric,
+  ResponseSnapshot,
+} from "../../typings";
 import {
   Typography,
   Drawer,
@@ -12,14 +23,25 @@ import {
   FloatButton,
   Tooltip,
   Card,
+  Switch,
 } from "antd";
 import { Radar } from "../../components/Radar";
 import ParentSize from "@visx/responsive/lib/components/ParentSize";
 import { Streamgraph } from "../../components/Streamgraph";
 import { Bar } from "../../components/BarStack";
+import { LoadingScreen } from "../../components/LoadingScreen";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
+
+const buildResponseDescription = (response: ResponseSnapshot) => {
+  const { createdAt, updatedAt } = response;
+
+  const createdAtDate = new Date(createdAt).toLocaleString();
+  const updatedAtDate = new Date(updatedAt).toLocaleString();
+
+  return `Created at ${createdAtDate}, last updated at ${updatedAtDate}`;
+};
 
 export const DashboardForm = () => {
   const navigate = useNavigate();
@@ -29,19 +51,43 @@ export const DashboardForm = () => {
   const [ready, setReady] = useState(false);
   const [form, setForm] = useState<FormSnapshot>();
   const [responses, setResponses] = useState<ResponseSnapshot[]>();
+  const [responseDescriptions, setResponseDescriptions] = useState<string[]>(
+    []
+  );
+  const [metrics, setMetrics] = useState<Metric[] | undefined>();
+  const [analytics, setAnalytics] = useState<FormAnalytics | undefined>();
 
   const initialize = useCallback(async () => {
     const form = await getForm(formId!);
     const responses = await getResponses(formId!);
+    const responseDescriptions = responses.map(buildResponseDescription);
 
     setForm(form);
     setResponses(responses);
+    setResponseDescriptions(responseDescriptions);
     setReady(true);
   }, [formId, setForm, setResponses, setReady]);
 
   useEffect(() => {
     if (!ready) initialize();
   }, [ready, initialize]);
+
+  const onClickGetMetrics = useCallback(async () => {
+    const metrics = await getFormMetrics(formId!);
+
+    console.log(metrics);
+
+    setMetrics(metrics);
+  }, [formId]);
+
+  const onClickGetAnalytics = useCallback(async () => {
+    const analytics = await getFormAnalytics(formId!);
+    const { emotions } = analytics;
+
+    console.log(emotions);
+
+    setAnalytics(analytics);
+  }, [formId]);
 
   const onClickEdit = useCallback(() => {
     navigate(`/_/forms/${formId}/edit`);
@@ -65,9 +111,9 @@ export const DashboardForm = () => {
     navigate(`/_/forms/${formId}`);
   }, [navigate, formId]);
 
-  if (!ready) return <div>loading...</div>;
+  if (!ready) return <LoadingScreen />;
   if (!form) return <div>not found</div>;
-  if (!responses) return <div>loading...</div>;
+  if (!responses) return <LoadingScreen />;
 
   return (
     <>
@@ -89,7 +135,21 @@ export const DashboardForm = () => {
 
         <Content style={{ paddingBottom: "50px" }}>
           <Space direction="vertical" className="w-full">
-            <Title>{form.title}</Title>
+            <div className="flex flex-row gap-2 items-center">
+              <Title
+                style={{
+                  marginBottom: 0,
+                }}
+              >
+                {form.title}
+              </Title>
+
+              <Switch
+                checkedChildren="Active"
+                unCheckedChildren="Inactive"
+                defaultChecked
+              />
+            </div>
 
             <Text>{form.description}</Text>
 
@@ -115,9 +175,25 @@ export const DashboardForm = () => {
               </div>
             </div>
 
+            <Space direction="horizontal">
+              <Button type="primary" onClick={onClickGetMetrics}>
+                Get Metrics
+              </Button>
+              <Button type="primary" onClick={onClickGetAnalytics}>
+                Get Analytics
+              </Button>
+            </Space>
+
             <Title level={2}>Questions</Title>
 
-            <Space wrap direction="horizontal">
+            <Space
+              style={{
+                maxHeight: 500,
+                overflow: "auto",
+              }}
+              wrap
+              direction="horizontal"
+            >
               {form.questions.map((question) => (
                 <Card
                   title={question.question}
@@ -139,10 +215,17 @@ export const DashboardForm = () => {
               ))}
             </Space>
 
-            <Title level={2}>Responses</Title>
+            <Title level={2}>Responses (n = {responses.length})</Title>
 
-            <Space wrap direction="horizontal">
-              {responses.map((response) => (
+            <Space
+              style={{
+                maxHeight: 500,
+                overflow: "auto",
+              }}
+              wrap
+              direction="horizontal"
+            >
+              {responses.map((response, i) => (
                 <Card
                   title={response.id}
                   extra={
@@ -155,10 +238,7 @@ export const DashboardForm = () => {
                   }
                   style={{ width: 300 }}
                 >
-                  <Text>
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Numquam.
-                  </Text>
+                  <Text>{responseDescriptions[i]}</Text>
                 </Card>
               ))}
             </Space>

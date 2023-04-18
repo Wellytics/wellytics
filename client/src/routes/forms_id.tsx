@@ -12,6 +12,7 @@ import { Breadcrumb, Button, Layout, Space, Typography } from "antd";
 import { renderQuestion, resolveEmptyAnswers } from "../utils";
 import { v4 as uuid } from "uuid";
 import { useTrackingId } from "../hooks/useTrackingId";
+import { LoadingScreen } from "../components/LoadingScreen";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -74,7 +75,7 @@ export const Form = () => {
     navigate("/");
   }, [id, trackingId, answers, navigate, formId]);
 
-  if (!ready) return <div>loading...</div>;
+  if (!ready) return <LoadingScreen />;
   if (!form) return <div>not found</div>;
 
   return (
