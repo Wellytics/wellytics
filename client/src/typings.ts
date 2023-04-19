@@ -223,3 +223,9 @@ export interface AnswerProps<T = Question, U = any> {
     question: T;
     answers: U[];
 }
+
+export interface TrackingView {
+    id: string;
+    createdAt: number;
+    updatedAt: number;
+}

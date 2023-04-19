@@ -1,8 +1,8 @@
 import { buildUrl } from "build-url-ts"
-import { Form, FormAnalytics, FormSnapshot, FormView, JobStatus, Metric, Question, QuestionView, Response, ResponseAnalytics, ResponseSnapshot } from "./typings"
+import { Form, FormAnalytics, FormSnapshot, FormView, JobStatus, Metric, Question, QuestionView, Response, ResponseAnalytics, ResponseSnapshot, TrackingView } from "./typings"
 import { initializeApp } from "firebase/app";
 import {
-    getFirestore, collection, getDoc, doc, setDoc, updateDoc, deleteDoc, getDocs, where, query, arrayUnion
+    getFirestore, collection, getDoc, doc, setDoc, updateDoc, deleteDoc, getDocs, where, query, arrayUnion, orderBy
 } from "firebase/firestore";
 
 const apiUrl = 'http://localhost:5000';
@@ -110,7 +110,16 @@ export const getFormMetrics = async (formId: string): Promise<Metric[]> => {
 }
 
 export const getFormAnalytics = async (formId: string): Promise<FormAnalytics> => {
-    throw new Error("Not implemented");
+    const url = buildUrl(apiUrl, {
+        path: `forms/${formId}/analytics`,
+    });
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to get form analytics");
+
+    const data = await response.json();
+
+    return data as FormAnalytics;
 }
 
 export const createResponse = async (formId: string, _response: Response): Promise<void> => {
@@ -184,6 +193,27 @@ export const getQuestion = async (questionId: string): Promise<Question> => {
     const questionDoc = await getDoc(questionRef);
     const questionDict = questionDoc.data();
     return questionDict as Question;
+}
+
+// This function should return unique tracking ids with their first occurrence as `createdAt` and last occurrence as `updatedAt`
+export const getTrackingViews = async (): Promise<TrackingView[]> => {
+    const querySnapshot = await getDocs(query(
+        metricsCollectionRef,
+        orderBy("createdAt", "asc")
+    ));
+    const metricDicts = querySnapshot.docs.map((doc) => doc.data());
+    const trackingIds = metricDicts.map((metricDict) => metricDict.trackingId);
+    const trackingIdsSet = new Set(trackingIds);
+    const trackingViews = Array.from(trackingIdsSet).map((trackingId) => {
+        const firstOccurrence = metricDicts.find((metricDict) => metricDict.trackingId === trackingId);
+        const lastOccurrence = metricDicts.reverse().find((metricDict) => metricDict.trackingId === trackingId);
+        return {
+            id: trackingId,
+            createdAt: firstOccurrence?.createdAt,
+            updatedAt: lastOccurrence?.createdAt,
+        };
+    });
+    return trackingViews as TrackingView[];
 }
 
 export const getTrackingId = async (trackingId: string): Promise<Metric[]> => {

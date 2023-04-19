@@ -1,18 +1,18 @@
-import React, { useCallback, useEffect, useState } from "react";
+import React, {
+  FC,
+  PropsWithChildren,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { useNavigate, useOutlet, useParams } from "react-router-dom";
 import {
   getForm,
   getFormAnalytics,
-  getFormMetrics,
   getResponses,
   setFormActive,
 } from "../../api";
-import {
-  FormAnalytics,
-  FormSnapshot,
-  Metric,
-  ResponseSnapshot,
-} from "../../typings";
+import { FormAnalytics, FormSnapshot, ResponseSnapshot } from "../../typings";
 import {
   Typography,
   Drawer,
@@ -25,11 +25,12 @@ import {
   Card,
   Switch,
 } from "antd";
-import { Radar } from "../../components/Radar";
+// import { Radar } from "../../components/Radar";
 import ParentSize from "@visx/responsive/lib/components/ParentSize";
-import { Streamgraph } from "../../components/Streamgraph";
+// import { Streamgraph } from "../../components/Streamgraph";
 import { Bar } from "../../components/BarStack";
 import { LoadingScreen } from "../../components/LoadingScreen";
+import { EmotionsBarStack } from "../../components/EmotionsBarStack";
 
 const { Content } = Layout;
 const { Title, Text } = Typography;
@@ -43,6 +44,18 @@ const buildResponseDescription = (response: ResponseSnapshot) => {
   return `Created at ${createdAtDate}, last updated at ${updatedAtDate}`;
 };
 
+const PlotsPlaceholder: FC<PropsWithChildren> = ({ children }) => {
+  return (
+    <>
+      <div className="w-full h-96 rounded border-4 border-dashed border-slate flex flex-row justify-center items-center">
+        {children}
+      </div>
+      <div className="w-full h-96 rounded border-4 border-dashed border-slate"></div>
+      <div className="w-full h-96 rounded border-4 border-dashed border-slate"></div>
+    </>
+  );
+};
+
 export const DashboardForm = () => {
   const navigate = useNavigate();
   const outlet = useOutlet();
@@ -54,7 +67,7 @@ export const DashboardForm = () => {
   const [responseDescriptions, setResponseDescriptions] = useState<string[]>(
     []
   );
-  const [metrics, setMetrics] = useState<Metric[] | undefined>();
+  // const [metrics, setMetrics] = useState<Metric[] | undefined>();
   const [analytics, setAnalytics] = useState<FormAnalytics | undefined>();
 
   const initialize = useCallback(async () => {
@@ -72,19 +85,13 @@ export const DashboardForm = () => {
     if (!ready) initialize();
   }, [ready, initialize]);
 
-  const onClickGetMetrics = useCallback(async () => {
-    const metrics = await getFormMetrics(formId!);
-
-    console.log(metrics);
-
-    setMetrics(metrics);
-  }, [formId]);
-
   const onClickGetAnalytics = useCallback(async () => {
     const analytics = await getFormAnalytics(formId!);
-    const { emotions } = analytics;
-
-    console.log(emotions);
+    
+    console.log(
+      // @ts-ignore
+      analytics.emotions["659ceb47-dbd9-4a90-982c-2ea6941faf48"].map((e) => e.label)
+    )
 
     setAnalytics(analytics);
   }, [formId]);
@@ -164,35 +171,29 @@ export const DashboardForm = () => {
             <Text>{form.description}</Text>
 
             <div className="flex flex-row gap-2">
-              <div className="w-full h-96 shadow">
-                <ParentSize>
-                  {({ width, height }) => (
-                    <Radar width={width} height={height} />
-                  )}
-                </ParentSize>
-              </div>
-              <div className="w-full h-96 shadow">
-                <ParentSize>
-                  {({ width, height }) => (
-                    <Streamgraph width={width} height={height} />
-                  )}
-                </ParentSize>
-              </div>
-              <div className="w-full h-96 shadow">
-                <ParentSize>
-                  {({ width, height }) => <Bar width={width} height={height} />}
-                </ParentSize>
-              </div>
+              {analytics === undefined ? (
+                <PlotsPlaceholder>
+                  <Button onClick={onClickGetAnalytics}>Get analytics</Button>
+                </PlotsPlaceholder>
+              ) : (
+                <>
+                  <div className="w-full h-96 shadow">
+                    <ParentSize>
+                      {({ width, height }) => (
+                        // <Bar width={width} height={height} />
+                        <EmotionsBarStack
+                          width={width}
+                          height={height}
+                          data={analytics.emotions!}
+                        />
+                      )}
+                    </ParentSize>
+                  </div>
+                  <div className="w-full h-96 rounded border-4 border-dashed border-slate"></div>
+                  <div className="w-full h-96 rounded border-4 border-dashed border-slate"></div>
+                </>
+              )}
             </div>
-
-            <Space direction="horizontal">
-              <Button type="primary" onClick={onClickGetMetrics}>
-                Get Metrics
-              </Button>
-              <Button type="primary" onClick={onClickGetAnalytics}>
-                Get Analytics
-              </Button>
-            </Space>
 
             <Title level={2}>Questions</Title>
 

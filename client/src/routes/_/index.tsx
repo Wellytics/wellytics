@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { FormView, QuestionView } from "../../typings";
-import { getForms, getQuestions } from "../../api";
+import { FormView, QuestionView, TrackingView } from "../../typings";
+import { getForms, getQuestions, getTrackingViews } from "../../api";
 import { Breadcrumb, Button, Card, Layout, Space, Typography } from "antd";
 import { LoadingScreen } from "../../components/LoadingScreen";
 
@@ -26,32 +26,50 @@ const buildQuestionDescription = (questionView: QuestionView) => {
   return `Created at ${createdAtDate} and last updated at ${updatedAtDate}.`;
 };
 
+const buildTrackingDescription = (trackingView: TrackingView) => {
+  const { createdAt, updatedAt } = trackingView;
+
+  const createdAtDate = new Date(createdAt).toLocaleString();
+  const updatedAtDate = new Date(updatedAt).toLocaleString();
+
+  return `Created at ${createdAtDate} and last updated at ${updatedAtDate}.`;
+};
+
 export const DashboardRoot = () => {
   const navigate = useNavigate();
 
   const [ready, setReady] = useState(false);
   const [formViews, setFormViews] = useState<FormView[]>([]);
   const [questionViews, setQuestionViews] = useState<QuestionView[]>([]);
+  const [trackingViews, setTrackingViews] = useState<TrackingView[]>([]);
+
   const [formDescriptions, setFormDescriptions] = useState<string[]>([]);
   const [questionDescriptions, setQuestionDescriptions] = useState<string[]>(
     []
   );
+  const [trackingDescriptions, setTrackingDescriptions] = useState<string[]>(
+    []
+  );
 
   const initialize = useCallback(async () => {
-    const [formViews, questionViews] = await Promise.all([
+    const [formViews, questionViews, trackingViews] = await Promise.all([
       getForms(false),
       getQuestions(),
+      getTrackingViews(),
     ]);
 
     const formDescriptions = formViews.map(buildFormDescription);
     const questionDescriptions = questionViews.map(buildQuestionDescription);
+    const trackingDescriptions = trackingViews.map(buildTrackingDescription);
 
     setFormViews(formViews);
     setQuestionViews(questionViews);
+    setTrackingViews(trackingViews);
     setFormDescriptions(formDescriptions);
     setQuestionDescriptions(questionDescriptions);
+    setTrackingDescriptions(trackingDescriptions);
     setReady(true);
-  }, [setReady, setFormViews, setQuestionViews]);
+  }, []);
 
   useEffect(() => {
     if (!ready) initialize();
@@ -71,13 +89,16 @@ export const DashboardRoot = () => {
     [navigate]
   );
 
-  const onClickMetrics = useCallback(() => {
-    navigate(`/_/metrics`);
-  }, [navigate]);
+  // const onClickMetrics = useCallback(() => {
+  //   navigate(`/_/metrics`);
+  // }, [navigate]);
 
-  const onClickTracking = useCallback(() => {
-    navigate(`/_/tracking`);
-  }, [navigate]);
+  const onClickTracking = useCallback(
+    (trackingId: string) => {
+      navigate(`/_/tracking/${trackingId}`);
+    },
+    [navigate]
+  );
 
   if (!ready) return <LoadingScreen />;
 
@@ -142,17 +163,39 @@ export const DashboardRoot = () => {
             ))}
           </Space>
 
-          <Title>Metrics</Title>
+          {/* <Title>Metrics</Title>
 
           <Button type="link" onClick={onClickMetrics}>
             Go
-          </Button>
+          </Button> */}
 
           <Title>Tracking</Title>
 
-          <Button type="link" onClick={onClickTracking}>
-            Go
-          </Button>
+          <Space
+            style={{
+              maxHeight: 500,
+              overflow: "auto",
+            }}
+            wrap
+            direction="horizontal"
+          >
+            {trackingViews.map((trackingView, i) => (
+              <Card
+                title={trackingView.id}
+                extra={
+                  <Button
+                    type="link"
+                    onClick={() => onClickTracking(trackingView.id)}
+                  >
+                    Go
+                  </Button>
+                }
+                style={{ width: 300 }}
+              >
+                <Text>{trackingDescriptions[i]}</Text>
+              </Card>
+            ))}
+          </Space>
         </Space>
       </Content>
     </Layout>

@@ -9,6 +9,7 @@ import {
   Space,
 } from "antd";
 import { UserOutlined, LockOutlined } from "@ant-design/icons";
+import { useNavigate } from "react-router-dom";
 
 const { Title } = Typography;
 const { Content } = Layout;
@@ -19,9 +20,15 @@ interface AuthValues {
 }
 
 export const DashboardAuth = () => {
-  const onFinish = useCallback(async (values: AuthValues) => {
-    console.log("Received values of form: ", values);
-  }, []);
+  const navigate = useNavigate();
+
+  const onFinish = useCallback(
+    async (values: AuthValues) => {
+      // TODO: For demo-ing purposes
+      navigate("/_");
+    },
+    [navigate]
+  );
 
   return (
     <Layout className="h-full" style={{ padding: "0 50px", overflow: "auto" }}>

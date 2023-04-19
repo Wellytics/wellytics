@@ -28,7 +28,9 @@ export const Root = () => {
   }, [ready, initialize]);
 
   const onClickDashboard = useCallback(() => {
-    navigate("/_");
+    // NOTE: For demo-ing purposes
+    // navigate("/_");
+    navigate("/_/auth")
   }, [navigate]);
 
   const onClickForm = useCallback(
@@ -67,6 +69,7 @@ export const Root = () => {
           </Space>
         </Space>
       </Content>
+
       {gotPong && (
         <Footer style={{ textAlign: "center" }}>
           <Button type="link" onClick={onClickDashboard}>
