@@ -1,10 +1,8 @@
 import threading
 import time
 
-from os.path import dirname, join
 from queue import Queue
-from typing import Any, Dict, List, Optional
-from pydantic import BaseModel
+from typing import Dict, List
 from transformers import pipeline
 
 from wellytics.models import (
@@ -23,18 +21,29 @@ from wellytics.utils import _find
 _keywords_model = "./bert-uncased-keyword-extractor"
 _emotions_model = "./distilbert-base-uncased-go-emotions-student"
 
-_keywords_pipeline = pipeline(
-    "ner",
-    model=_keywords_model,
-    tokenizer=_keywords_model,
-)
+_keywords_pipeline = None
 
-_emotions_pipeline = pipeline(
-    "text-classification",
-    model=_emotions_model,
-    tokenizer=_emotions_model,
-    return_all_scores=True,
-)
+
+def _load_keywords_model():
+    global _keywords_pipeline
+    _keywords_pipeline = pipeline(
+        "ner",
+        model=_keywords_model,
+        tokenizer=_keywords_model,
+    )
+
+
+_emotions_pipeline = None
+
+
+def _load_emotions_model():
+    global _emotions_pipeline
+    _emotions_pipeline = pipeline(
+        "text-classification",
+        model=_emotions_model,
+        tokenizer=_emotions_model,
+        return_all_scores=True,
+    )
 
 
 _jobs: dict[str, Job] = {}
@@ -80,6 +89,9 @@ target_emotions = [
 
 
 def _get_keywords(text: str):
+    if _keywords_pipeline is None:
+        _load_keywords_model()
+
     outputs = _keywords_pipeline(text)
     outputs = sorted(outputs, key=lambda x: x["start"])
 
@@ -114,6 +126,9 @@ def _get_keywords(text: str):
 
 
 def _get_emotions(text: str):
+    if _emotions_pipeline is None:
+        _load_emotions_model()
+
     outputs = _emotions_pipeline(text)[0]
     outputs = sorted(outputs, reverse=True, key=lambda x: x["score"])
     outputs = [Emotion(**output) for output in outputs]

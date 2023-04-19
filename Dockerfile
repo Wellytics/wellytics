@@ -8,13 +8,17 @@ ENV PYTHONUNBUFFERED True
 COPY requirements.txt /
 RUN pip install -r requirements.txt
 
-# Set the WORKDIR to be the folder
 COPY wellytics/ /app
+COPY bert-uncased-keyword-extractor /app
+COPY distilbert-base-uncased-go-emotions-student /app
+
+# Set the WORKDIR to be the folder
+WORKDIR /app
 
 # Expose port 5000
 EXPOSE 5000
 ENV PORT 5000
-WORKDIR /app
 
 # Use gunicorn as the entrypoint
-CMD exec gunicorn --bind :$PORT main:app --workers 1 --threads 1 --timeout 0
+# CMD exec gunicorn --bind :$PORT main:app --workers 1 --threads 1 --timeout 0
+CMD ["python", "-m", "wellytics"]

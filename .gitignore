@@ -1,7 +1,9 @@
-credentials.json
 gitignore/
 bert-uncased-keyword-extractor/
 distilbert-base-uncased-go-emotions-student/
+
+credentials.json
+cloudbuild.yaml
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
