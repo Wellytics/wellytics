@@ -97,18 +97,6 @@ export const deleteForm = async (formId: string): Promise<void> => {
     await deleteDoc(formRef);
 }
 
-export const getFormMetrics = async (formId: string): Promise<Metric[]> => {
-    const formRef = doc(db, "forms", formId);
-    const formDoc = await getDoc(formRef);
-    const formDict = formDoc.data();
-    if (!formDict) return [];
-    const questionRefs = formDict.questions;
-    const questionDocs = await Promise.all(questionRefs.map((questionRef: any) => getDoc(questionRef)));
-    const questionDicts = questionDocs.map((questionDoc) => questionDoc.data());
-    const metricDicts = questionDicts.flatMap((questionDict) => questionDict.metrics);
-    return metricDicts as Metric[];
-}
-
 export const getFormAnalytics = async (formId: string): Promise<FormAnalytics> => {
     const url = buildUrl(apiUrl, {
         path: `forms/${formId}/analytics`,
@@ -123,13 +111,10 @@ export const getFormAnalytics = async (formId: string): Promise<FormAnalytics> =
 }
 
 export const createResponse = async (formId: string, _response: Response): Promise<void> => {
+    if (_response.metrics.length > 0) throw new Error("Metrics should not be included in response creation");
+
     const responseRef = doc(db, formId, _response.id);
-    const metricRefs = _response.metrics.map((metricId) => doc(db, "metrics", metricId));
-    const responseDict = {
-        ..._response,
-        metrics: metricRefs,
-    };
-    await setDoc(responseRef, responseDict);
+    await setDoc(responseRef, _response);
 }
 
 export const getResponses = async (formId: string): Promise<ResponseSnapshot[]> => {
@@ -170,9 +155,11 @@ export const getResponseMetrics = async (formId: string, responseId: string): Pr
     const responseDoc = await getDoc(responseRef);
     const responseDict = responseDoc.data();
     if (!responseDict) return [];
+
     const metricRefs = responseDict.metrics;
     const metricDocs = await Promise.all(metricRefs.map((metricRef: any) => getDoc(metricRef)));
     const metricDicts = metricDocs.map((metricDoc) => metricDoc.data());
+    
     return metricDicts as Metric[];
 }
 
@@ -222,6 +209,10 @@ export const getTrackingId = async (trackingId: string): Promise<Metric[]> => {
     );
     const metricDicts = querySnapshot.docs.map((doc) => doc.data());
     return metricDicts as Metric[];
+}
+
+export const getFormMetrics = async (formId: string): Promise<Metric[]> => {
+    throw new Error("Not implemented");
 }
 
 export const getResponseAnalytics = async (formId: string, responseId: string): Promise<ResponseAnalytics> => {

@@ -26,14 +26,9 @@ const tooltipStyles = {
 
 const defaultMargin = { top: 0, left: 0 };
 
-// scales
-const labelScale = scaleBand<string>({
-  //   padding: 0.2,
-});
+const labelScale = scaleBand<string>({});
 
-const scoreScale = scaleLinear<number>({
-  nice: true,
-});
+const scoreScale = scaleLinear<number>({});
 
 const background = "#eaedff";
 

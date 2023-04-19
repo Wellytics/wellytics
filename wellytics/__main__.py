@@ -21,9 +21,11 @@ def form_analytics(form_id: str):
     return jsonify(analytics)
 
 
+# NOTE: Should accept `force` as a query param
 @flask_app.route("/forms/<form_id>/responses/<response_id>/analytics", methods=["GET"])
 def form_response_analytics(form_id: str, response_id: str):
-    analytics = api.get_response_analytics(form_id, response_id)
+    force = request.args.get("force", type=bool, default=False)
+    analytics = api.get_response_analytics(form_id, response_id, force=force)
     analytics = analytics.dict()
     return jsonify(analytics)
 

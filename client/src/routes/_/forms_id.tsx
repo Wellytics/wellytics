@@ -25,10 +25,7 @@ import {
   Card,
   Switch,
 } from "antd";
-// import { Radar } from "../../components/Radar";
 import ParentSize from "@visx/responsive/lib/components/ParentSize";
-// import { Streamgraph } from "../../components/Streamgraph";
-import { Bar } from "../../components/BarStack";
 import { LoadingScreen } from "../../components/LoadingScreen";
 import { EmotionsBarStack } from "../../components/EmotionsBarStack";
 
@@ -86,13 +83,9 @@ export const DashboardForm = () => {
   }, [ready, initialize]);
 
   const onClickGetAnalytics = useCallback(async () => {
-    const analytics = await getFormAnalytics(formId!);
-    
-    console.log(
-      // @ts-ignore
-      analytics.emotions["659ceb47-dbd9-4a90-982c-2ea6941faf48"].map((e) => e.label)
-    )
+    console.log("getting analytics");
 
+    const analytics = await getFormAnalytics(formId!);
     setAnalytics(analytics);
   }, [formId]);
 
@@ -171,9 +164,13 @@ export const DashboardForm = () => {
             <Text>{form.description}</Text>
 
             <div className="flex flex-row gap-2">
-              {analytics === undefined ? (
+              {analytics === undefined || analytics.status === "Pending" ? (
                 <PlotsPlaceholder>
-                  <Button onClick={onClickGetAnalytics}>Get analytics</Button>
+                  {analytics?.status === "Pending" ? (
+                    <Text>Generating analytics...</Text>
+                  ) : (
+                    <Button onClick={onClickGetAnalytics}>Get analytics</Button>
+                  )}
                 </PlotsPlaceholder>
               ) : (
                 <>
