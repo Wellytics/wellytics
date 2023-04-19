@@ -1,4 +1,4 @@
-// import { buildUrl } from "build-url-ts"
+import { buildUrl } from "build-url-ts"
 import { Form, FormAnalytics, FormSnapshot, FormView, JobStatus, Metric, Question, QuestionView, Response, ResponseAnalytics, ResponseSnapshot } from "./typings"
 import { initializeApp } from "firebase/app";
 import {
@@ -18,13 +18,27 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-// const DEFAULT_API_URL = 'http://localhost:5000';
+const apiUrl = 'http://localhost:5000';
 
-// export const _loadApiUrl = () =>
-//     localStorage.getItem('apiUrl') || DEFAULT_API_URL;
+export const ping = async (): Promise<boolean> => {
+    const url = buildUrl(apiUrl, {
+        path: 'ping',
+    });
 
-// export const _saveApiUrl = (apiUrl: string) =>
-//     localStorage.setItem('apiUrl', apiUrl);
+    let response;
+    try {
+        response = await fetch(url);
+    } catch {
+        return false;
+    }
+
+    if (!response.ok) return false;
+
+    const data = await response.json();
+    if (data !== 'pong') return false;
+
+    return true;
+}
 
 
 export const createForm = async (form: Form): Promise<void> => {

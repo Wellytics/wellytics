@@ -2,10 +2,9 @@ import time
 
 from typing import List
 from firebase_admin import initialize_app, firestore, credentials
-from firebase_admin.firestore import ArrayUnion
 from pydantic import BaseModel
 
-from wellytics.utils import uuid, _map, _find_index
+from wellytics.utils import uuid, _map
 from wellytics.processing import (
     _job_lock,
     _jobs,
@@ -13,18 +12,14 @@ from wellytics.processing import (
     _orchestrator_thread,
 )
 from wellytics.models import (
-    Form,
     FormAnalytics,
     FormAnalyticsCollection,
     FormSnapshot,
-    FormView,
     Job,
     JobStatus,
     JobType,
     Metric,
     Question,
-    QuestionView,
-    Response,
     ResponseAnalytics,
     ResponseAnalyticsCollection,
     ResponseSnapshot,
@@ -154,94 +149,8 @@ def _create_form_analytics_jobs(form_id: str) -> str:
 # endregion
 
 
-# region Create
-def create_question(question: Question):
-    firestore.collection("questions").document(question.id).set(question.dict())
-
-
-def create_form(form: Form):
-    question_refs = _map(
-        lambda x: firestore.collection("questions").document(x),
-        form.questions,
-    )
-
-    form_dict = form.dict()
-    form_dict["questions"] = question_refs
-
-    firestore.collection("forms").document(form.id).set(form_dict)
-
-
-def create_metric(metric: Metric):
-    firestore.collection("metrics").document(metric.id).set(metric.dict())
-
-
-def create_response(response: Response):
-    form_id = response.formId
-    metric_refs = _map(
-        lambda x: firestore.collection("metrics").document(x), response.metrics
-    )
-
-    response_dict = response.dict()
-    response_dict["metrics"] = metric_refs
-
-    firestore.collection(form_id).document(response.id).set(response_dict)
-
-
-# endregion
-
-
-# region Get
-def get_questions() -> List[QuestionView]:
-    question_dicts = _map(
-        lambda x: x.to_dict(),
-        (
-            firestore.collection("questions")
-            .select(["createdAt", "updatedAt", "id", "type", "question"])
-            .stream()
-        ),
-    )
-    return _map(lambda x: QuestionView(**x), question_dicts)
-
-
-def get_question(question_id: str) -> Question:
-    question_snapshot = firestore.collection("questions").document(question_id).get()
-    question_dict = question_snapshot.to_dict()
-    return Question(**question_dict)
-
-
-def get_forms(only_active: bool = True) -> List[FormView]:
-    forms_collection_ref = firestore.collection("forms")
-
-    if only_active:
-        forms_collection_ref = forms_collection_ref.where("active", "==", True)
-
-    form_view_dicts = _map(
-        lambda x: x.to_dict(),
-        (
-            forms_collection_ref.select(
-                ["active", "createdAt", "updatedAt", "id", "title", "description"]
-            ).stream()
-        ),
-    )
-    return _map(lambda x: FormView(**x), form_view_dicts)
-
-
 def get_form(form_id: str) -> FormSnapshot:
     return _form_snapshot(firestore.collection("forms").document(form_id).get())
-
-
-def get_metrics() -> List[Metric]:
-    metric_dicts = _map(
-        lambda x: x.to_dict(),
-        (firestore.collection("metrics").stream()),
-    )
-    return _map(lambda x: Metric(**x), metric_dicts)
-
-
-def get_metric(metric_id: str):
-    metric_snapshot = firestore.collection("metrics").document(metric_id).get()
-    metric_dict = metric_snapshot.to_dict()
-    return Metric(**metric_dict)
 
 
 def get_responses(form_id: str) -> List[ResponseSnapshot]:
@@ -251,36 +160,6 @@ def get_responses(form_id: str) -> List[ResponseSnapshot]:
 
 def get_response(form_id: str, response_id: str) -> ResponseSnapshot:
     return _response_snapshot(firestore.collection(form_id).document(response_id).get())
-
-
-# TODO: Aggregate metrics
-def get_form_metrics(form_id: str) -> List[Metric]:
-    metric_snapshots = [
-        metric_ref.get()
-        for metrics_ref in firestore.collection(form_id).select(["metrics"]).stream()
-        for metric_ref in metrics_ref.get("metrics")
-    ]
-    metric_dicts = _map(lambda x: x.to_dict(), metric_snapshots)
-    return _map(lambda x: Metric(**x), metric_dicts)
-
-
-def get_response_metrics(form_id: str, response_id: str) -> List[Metric]:
-    response_snapshot = firestore.collection(form_id).document(response_id).get()
-    response = _response_snapshot(response_snapshot)
-    metrics = response.metrics
-    return metrics
-
-
-def get_tracking(tracking_id: str):
-    metrics_dicts = [
-        metric_ref.to_dict()
-        for metric_ref in (
-            firestore.collection("metrics")
-            .where("trackingId", "==", tracking_id)
-            .stream()
-        )
-    ]
-    return _map(lambda x: Metric(**x), metrics_dicts)
 
 
 def get_form_analytics(form_id: str, force: bool = False) -> FormAnalytics:
@@ -315,107 +194,3 @@ def get_response_analytics(
         cached_analytics_snapshot = cached_analytics_ref.get()
 
     return ResponseAnalytics(**cached_analytics_snapshot.to_dict())
-
-
-# endregion
-
-
-# region Add
-def add_question_to_form(form_id: str, question_id: str) -> None:
-    question_ref = firestore.collection("questions").document(question_id)
-    form_ref = firestore.collection("forms").document(form_id)
-    form_ref.update({"questions": ArrayUnion([question_ref])})
-
-
-def add_metric_to_response(form_id: str, response_id: str, metric_id: str) -> None:
-    metric_ref = firestore.collection("metrics").document(metric_id)
-    response_ref = firestore.collection(form_id).document(response_id)
-    response_ref.update({"metrics": ArrayUnion([metric_ref])})
-
-
-# endregion
-
-
-# region Patch
-def patch_question(question_id: str, patch: dict) -> None:
-    firestore.collection("questions").document(question_id).update(patch)
-
-
-# TODO: If questions are not added to the form, add them
-def patch_form(form_id: str, patch: dict) -> None:
-    if "questions" in patch:
-        questions = patch.pop("questions")
-        _map(
-            lambda question: patch_question(question["id"], question),
-            questions,
-        )
-
-    firestore.collection("forms").document(form_id).update(patch)
-
-
-def patch_metric(metric_id: str, patch: dict) -> None:
-    firestore.collection("metrics").document(metric_id).update(patch)
-
-
-# TODO: If metrics are not added to the response, add them
-def patch_response(form_id: str, response_id: str, patch: dict) -> None:
-    if "metrics" in patch:
-        metrics = patch.pop("metrics")
-        _map(
-            lambda metric: patch_metric(metric["id"], metric),
-            metrics,
-        )
-    firestore.collection(form_id).document(response_id).update(patch)
-
-
-# endregion
-
-
-# region Delete
-def delete_form(form_id: str) -> None:
-    firestore.collection("forms").document(form_id).delete()
-
-
-def delete_response(form_id: str, response_id: str) -> None:
-    firestore.collection(form_id).document(response_id).delete()
-
-
-# endregion
-
-
-# region Utils
-def set_form_active(form_id: str, active: bool) -> None:
-    firestore.collection("forms").document(form_id).update({"active": active})
-
-
-def move_question_up(form_id: str, question_id: str, amount: int = 1) -> None:
-    form_snapshot = firestore.collection("forms").document(form_id).get()
-    question_refs = form_snapshot.get("questions")
-    question_index = _find_index(lambda x: x.id == question_id, question_refs)
-    if question_index == 0:
-        return
-    if question_index - amount < 0:
-        amount = question_index
-    question_refs[question_index], question_refs[question_index - amount] = (
-        question_refs[question_index - amount],
-        question_refs[question_index],
-    )
-    firestore.collection("forms").document(form_id).update({"questions": question_refs})
-
-
-def move_question_down(form_id: str, question_id: str, amount: int = 1) -> None:
-    form_snapshot = firestore.collection("forms").document(form_id).get()
-    question_refs = form_snapshot.get("questions")
-    question_index = _find_index(lambda x: x.id == question_id, question_refs)
-    if question_index == len(question_refs) - 1:
-        return
-    if question_index + amount > len(question_refs) - 1:
-        amount = len(question_refs) - 1 - question_index
-    question_refs[question_index], question_refs[question_index + amount] = (
-        question_refs[question_index + amount],
-        question_refs[question_index],
-    )
-    firestore.collection("forms").document(form_id).update({"questions": question_refs})
-
-
-# endregion

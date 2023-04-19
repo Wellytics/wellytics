@@ -1,7 +1,7 @@
 import React, { useCallback, useEffect, useState } from "react";
 import { FormView } from "../typings";
 import { useNavigate } from "react-router-dom";
-import { getForms } from "../api";
+import { getForms, ping } from "../api";
 import { Breadcrumb, Button, Card, Layout, Space, Typography } from "antd";
 import { LoadingScreen } from "../components/LoadingScreen";
 
@@ -13,10 +13,13 @@ export const Root = () => {
 
   const [ready, setReady] = useState(false);
   const [formViews, setFormViews] = useState<FormView[]>([]);
+  const [gotPong, setGotPong] = useState(false);
 
   const initialize = useCallback(async () => {
     const formViews = await getForms();
+    const pong = await ping();
     setFormViews(formViews);
+    setGotPong(pong);
     setReady(true);
   }, [setReady, setFormViews]);
 
@@ -64,11 +67,13 @@ export const Root = () => {
           </Space>
         </Space>
       </Content>
-      <Footer style={{ textAlign: "center" }}>
-        <Button type="link" onClick={onClickDashboard}>
-          Go to dashboard
-        </Button>
-      </Footer>
+      {gotPong && (
+        <Footer style={{ textAlign: "center" }}>
+          <Button type="link" onClick={onClickDashboard}>
+            Go to dashboard
+          </Button>
+        </Footer>
+      )}
     </Layout>
   );
 };
