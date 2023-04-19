@@ -97,6 +97,22 @@ export const deleteForm = async (formId: string): Promise<void> => {
     await deleteDoc(formRef);
 }
 
+// name of the collection "formAnalyses" is a typo, but it's too late to change it now
+export const hasFormAnalytics = async (formId: string): Promise<boolean> => {
+    const formAnalysesCollectionRef = collection(db, "formAnalyses");
+    const formAnalyticsRef = doc(formAnalysesCollectionRef, formId);
+    const formAnalyticsDoc = await getDoc(formAnalyticsRef);
+    return formAnalyticsDoc.exists();
+}
+
+// name of the collection "responseAnalyses" is a typo, but it's too late to change it now
+export const hasResponseAnalytics = async (formId: string, responseId: string): Promise<boolean> => {
+    const responseAnalysesCollectionRef = collection(db, "responseAnalyses");
+    const responseAnalyticsRef = doc(responseAnalysesCollectionRef, responseId);
+    const responseAnalyticsDoc = await getDoc(responseAnalyticsRef);
+    return responseAnalyticsDoc.exists();
+}
+
 export const getFormAnalytics = async (formId: string): Promise<FormAnalytics> => {
     const url = buildUrl(apiUrl, {
         path: `forms/${formId}/analytics`,
@@ -159,7 +175,7 @@ export const getResponseMetrics = async (formId: string, responseId: string): Pr
     const metricRefs = responseDict.metrics;
     const metricDocs = await Promise.all(metricRefs.map((metricRef: any) => getDoc(metricRef)));
     const metricDicts = metricDocs.map((metricDoc) => metricDoc.data());
-    
+
     return metricDicts as Metric[];
 }
 

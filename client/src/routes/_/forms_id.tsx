@@ -10,6 +10,7 @@ import {
   getForm,
   getFormAnalytics,
   getResponses,
+  hasFormAnalytics,
   setFormActive,
 } from "../../api";
 import { FormAnalytics, FormSnapshot, ResponseSnapshot } from "../../typings";
@@ -64,12 +65,17 @@ export const DashboardForm = () => {
   const [responseDescriptions, setResponseDescriptions] = useState<string[]>(
     []
   );
-  // const [metrics, setMetrics] = useState<Metric[] | undefined>();
   const [analytics, setAnalytics] = useState<FormAnalytics | undefined>();
 
   const initialize = useCallback(async () => {
     const form = await getForm(formId!);
     const responses = await getResponses(formId!);
+
+    if (await hasFormAnalytics(formId!)) {
+      const analytics = await getFormAnalytics(formId!);
+      setAnalytics(analytics);
+    }
+
     const responseDescriptions = responses.map(buildResponseDescription);
 
     setForm(form);
@@ -83,8 +89,6 @@ export const DashboardForm = () => {
   }, [ready, initialize]);
 
   const onClickGetAnalytics = useCallback(async () => {
-    console.log("getting analytics");
-
     const analytics = await getFormAnalytics(formId!);
     setAnalytics(analytics);
   }, [formId]);

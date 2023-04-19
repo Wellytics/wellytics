@@ -10,9 +10,6 @@ import { DashboardFormQuestion } from "./routes/_/forms_questions_id";
 import { DashboardFormResponse } from "./routes/_/forms_responses_id";
 import { DashboardQuestion } from "./routes/_/questions_id";
 import { DashboardMetrics } from "./routes/_/metrics";
-import { DashboardMetric } from "./routes/_/metrics_id";
-import { DashboardMetricEdit } from "./routes/_/metrics_edit";
-import { DashboardTracking } from "./routes/_/tracking";
 import { DashboardTrackingId } from "./routes/_/tracking_id";
 
 const router = createHashRouter([
@@ -58,20 +55,6 @@ const router = createHashRouter([
   {
     path: "_/metrics",
     element: <DashboardMetrics />,
-  },
-  {
-    path: "_/metrics/:metricId",
-    element: <DashboardMetric />,
-    children: [
-      {
-        path: "edit",
-        element: <DashboardMetricEdit />,
-      },
-    ],
-  },
-  {
-    path: "_/tracking",
-    element: <DashboardTracking />,
   },
   {
     path: "_/tracking/:trackingId",

@@ -4,6 +4,7 @@ from typing import List
 from firebase_admin import initialize_app, firestore, credentials
 from firebase_admin.firestore import ArrayUnion
 from pydantic import BaseModel
+from threading import Thread
 
 from wellytics.utils import uuid, _map
 from wellytics.processing import (
@@ -36,7 +37,7 @@ _orchestrator_thread.start()
 def _response_snapshot(response_snapshot) -> ResponseSnapshot:
     response_dict = response_snapshot.to_dict()
 
-    metric_snapshots = _map(lambda x: x.get(), response_dict["metrics"])
+    metric_snapshots = _map(lambda x: x.get(), response_dict.get("metrics", []))
     metric_dicts = _map(lambda x: x.to_dict(), metric_snapshots)
     metrics = _map(lambda x: Metric(**x), metric_dicts)
 
@@ -48,7 +49,7 @@ def _response_snapshot(response_snapshot) -> ResponseSnapshot:
 def _form_snapshot(form_snapshot) -> FormSnapshot:
     form_dict = form_snapshot.to_dict()
 
-    questions_snapshot = _map(lambda x: x.get(), form_dict["questions"])
+    questions_snapshot = _map(lambda x: x.get(), form_dict.get("questions", []))
     questions_dict = _map(lambda x: x.to_dict(), questions_snapshot)
     questions = _map(lambda x: Question(**x), questions_dict)
 
@@ -75,7 +76,7 @@ def _create_job_skeleton_document(collection: str, id: str, job_id: str, **kwarg
     )
 
 
-def _create_job_callback(collection: str, id: str, cb: callable = None):
+def _create_job_callback(collection: str, id: str, _callback: callable = None):
     def callback(error: bool, response: BaseModel):
         document_ref = firestore.collection(collection).document(id)
         if error:
@@ -83,8 +84,9 @@ def _create_job_callback(collection: str, id: str, cb: callable = None):
             document_ref.update({"status": JobStatus.Error})
             return
 
-        if cb:
-            cb(response)
+        if _callback:
+            _thread = Thread(target=_callback, args=(response,))
+            _thread.start()
 
         document_ref.update({**response.dict(), "status": JobStatus.Finished})
 
@@ -93,8 +95,8 @@ def _create_job_callback(collection: str, id: str, cb: callable = None):
 
 def _create_job(collection: str, id: str, type: str, payload: dict, **kwargs):
     job_id = uuid()
-    cb = kwargs.pop("cb", None)
-    callback = _create_job_callback(collection, id, cb=cb)
+    _callback = kwargs.pop("_callback", None)
+    callback = _create_job_callback(collection, id, _callback=_callback)
     job = Job(
         id=job_id,
         type=type,
@@ -120,18 +122,18 @@ def _create_job(collection: str, id: str, type: str, payload: dict, **kwargs):
 
 
 def _create_response_analytics_job(form_id: str, response_id: str) -> str:
-    def cb(response: ResponseAnalytics):
+    def _callback(response: ResponseAnalytics):
         now = int(time.time())
         for _, emotions in response.emotions.items():
-            for emotion in emotions:
-                metric = Metric(
-                    id=uuid(),
-                    createdAt=response.createdAt,
-                    updatedAt=now,
-                    trackingId=response.trackingId,
-                    values={emotion.label: emotion.score},
-                )
-                create_metric(form_id, response_id, metric)
+            emotions = {emotion.label: emotion.score for emotion in emotions}
+            metric = Metric(
+                id=uuid(),
+                createdAt=response.createdAt,
+                updatedAt=now,
+                trackingId=response.trackingId,
+                values=emotions,
+            )
+            create_metric(form_id, response_id, metric)
 
     form = get_form(form_id)
     response = get_response(form_id, response_id)
@@ -143,26 +145,33 @@ def _create_response_analytics_job(form_id: str, response_id: str) -> str:
         {"form": form, "response": response},
         formId=form_id,
         trackingId=response.trackingId,
-        cb=cb,
+        _callback=_callback,
     )
 
     return job_id
 
 
 def _create_form_analytics_jobs(form_id: str) -> str:
-    def cb(response: FormAnalytics):
+    def _callback(response: FormAnalytics):
         now = int(time.time())
         for responseAnalytics in response.responseAnalytics:
+            document_ref = firestore.collection(ResponseAnalyticsCollection).document(
+                responseAnalytics.id
+            )
+            document_ref.set(
+                {**responseAnalytics.dict(), "status": JobStatus.Finished}
+            )
+
             for _, emotions in responseAnalytics.emotions.items():
-                for emotion in emotions:
-                    metric = Metric(
-                        id=uuid(),
-                        createdAt=response.createdAt,
-                        updatedAt=now,
-                        trackingId=responseAnalytics.trackingId,
-                        values={emotion.label: emotion.score},
-                    )
-                    create_metric(form_id, responseAnalytics.id, metric)
+                emotions = {emotion.label: emotion.score for emotion in emotions}
+                metric = Metric(
+                    id=uuid(),
+                    createdAt=response.createdAt,
+                    updatedAt=now,
+                    trackingId=responseAnalytics.trackingId,
+                    values=emotions,
+                )
+                create_metric(form_id, responseAnalytics.id, metric)
 
     form = get_form(form_id)
     responses = get_responses(form_id)
@@ -173,7 +182,7 @@ def _create_form_analytics_jobs(form_id: str) -> str:
         JobType.FormAnalytics,
         {"form": form, "responses": responses},
         formId=form_id,
-        cb=cb,
+        _callback=_callback,
     )
 
     return job_id
