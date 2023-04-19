@@ -5,9 +5,9 @@ import {
   getFormAnalytics,
   getFormMetrics,
   getResponses,
+  setFormActive,
 } from "../../api";
 import {
-  Emotion,
   FormAnalytics,
   FormSnapshot,
   Metric,
@@ -111,6 +111,15 @@ export const DashboardForm = () => {
     navigate(`/_/forms/${formId}`);
   }, [navigate, formId]);
 
+  const onSetFormActive = useCallback(
+    async (active: boolean) => {
+      await setFormActive(formId!, active);
+      const form = await getForm(formId!);
+      setForm(form);
+    },
+    [formId]
+  );
+
   if (!ready) return <LoadingScreen />;
   if (!form) return <div>not found</div>;
   if (!responses) return <LoadingScreen />;
@@ -147,7 +156,8 @@ export const DashboardForm = () => {
               <Switch
                 checkedChildren="Active"
                 unCheckedChildren="Inactive"
-                defaultChecked
+                checked={form.active}
+                onChange={onSetFormActive}
               />
             </div>
 

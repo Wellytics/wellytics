@@ -1,42 +1,37 @@
-import React from 'react'
-import {
-  createHashRouter,
-  RouterProvider,
-} from "react-router-dom";
-import { Root } from './routes';
-import { Form } from './routes/forms_id';
-import { DashboardRoot } from './routes/_';
-import { DashboardAuth } from './routes/_/auth';
-import { DashboardForm } from './routes/_/forms_id';
-import { DashboardFormEdit } from './routes/_/forms_edit';
-import { DashboardFormQuestion } from './routes/_/forms_questions_id';
-import { DashboardFormResponse } from './routes/_/forms_responses_id';
-import { DashboardQuestion } from './routes/_/questions_id';
-import { DashboardQuestionEdit } from './routes/_/questions_edit';
-import { DashboardMetrics } from './routes/_/metrics';
-import { DashboardMetric } from './routes/_/metrics_id';
-import { DashboardMetricEdit } from './routes/_/metrics_edit';
-import { DashboardTracking } from './routes/_/tracking';
-import { DashboardTrackingId } from './routes/_/tracking_id';
+import React from "react";
+import { createHashRouter, RouterProvider } from "react-router-dom";
+import { Root } from "./routes";
+import { Form } from "./routes/forms_id";
+import { DashboardRoot } from "./routes/_";
+import { DashboardAuth } from "./routes/_/auth";
+import { DashboardForm } from "./routes/_/forms_id";
+import { DashboardFormEdit } from "./routes/_/forms_edit";
+import { DashboardFormQuestion } from "./routes/_/forms_questions_id";
+import { DashboardFormResponse } from "./routes/_/forms_responses_id";
+import { DashboardQuestion } from "./routes/_/questions_id";
+import { DashboardMetrics } from "./routes/_/metrics";
+import { DashboardMetric } from "./routes/_/metrics_id";
+import { DashboardMetricEdit } from "./routes/_/metrics_edit";
+import { DashboardTracking } from "./routes/_/tracking";
+import { DashboardTrackingId } from "./routes/_/tracking_id";
 
 const router = createHashRouter([
   {
     path: "/",
-    element: <Root />
+    element: <Root />,
   },
   {
     path: "forms/:formId",
-    element: <Form />
+    element: <Form />,
   },
   {
     path: "_",
     element: <DashboardRoot />,
-    children: [
-    ]
+    children: [],
   },
   {
     path: "_/auth",
-    element: <DashboardAuth />
+    element: <DashboardAuth />,
   },
   {
     path: "_/forms/:formId",
@@ -44,31 +39,25 @@ const router = createHashRouter([
     children: [
       {
         path: "edit",
-        element: <DashboardFormEdit />
+        element: <DashboardFormEdit />,
       },
       {
         path: "questions/:questionId",
-        element: <DashboardFormQuestion />
+        element: <DashboardFormQuestion />,
       },
       {
         path: "responses/:responseId",
-        element: <DashboardFormResponse />
+        element: <DashboardFormResponse />,
       },
-    ]
+    ],
   },
   {
     path: "_/questions/:questionId",
     element: <DashboardQuestion />,
-    children: [
-      {
-        path: "edit",
-        element: <DashboardQuestionEdit />
-      }
-    ]
   },
   {
     path: "_/metrics",
-    element: <DashboardMetrics />
+    element: <DashboardMetrics />,
   },
   {
     path: "_/metrics/:metricId",
@@ -76,22 +65,20 @@ const router = createHashRouter([
     children: [
       {
         path: "edit",
-        element: <DashboardMetricEdit />
-      }
-    ]
+        element: <DashboardMetricEdit />,
+      },
+    ],
   },
   {
     path: "_/tracking",
-    element: <DashboardTracking />
+    element: <DashboardTracking />,
   },
   {
     path: "_/tracking/:trackingId",
-    element: <DashboardTrackingId />
-  }
+    element: <DashboardTrackingId />,
+  },
 ]);
 
 export const App = () => {
-  return (
-    <RouterProvider router={router} />
-  )
-}
+  return <RouterProvider router={router} />;
+};

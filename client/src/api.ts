@@ -5,6 +5,8 @@ import {
     getFirestore, collection, getDoc, doc, setDoc, updateDoc, deleteDoc, getDocs, where, query, arrayUnion
 } from "firebase/firestore";
 
+const apiUrl = 'http://localhost:5000';
+
 const firebaseConfig = {
     apiKey: "AIzaSyDEHoDI6LnDqR3hnu3GU0m_exVA4fFRPLc",
     authDomain: "wellytics-114f3.firebaseapp.com",
@@ -18,7 +20,9 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getFirestore(app);
 
-const apiUrl = 'http://localhost:5000';
+const formsCollectionRef = collection(db, "forms");
+const questionsCollectionRef = collection(db, "questions");
+const metricsCollectionRef = collection(db, "metrics");
 
 export const ping = async (): Promise<boolean> => {
     const url = buildUrl(apiUrl, {
@@ -40,7 +44,6 @@ export const ping = async (): Promise<boolean> => {
     return true;
 }
 
-
 export const createForm = async (form: Form): Promise<void> => {
     const formRef = doc(db, "forms", form.id);
     const questionRefs = form.questions.map((questionId) => doc(db, "questions", questionId));
@@ -51,8 +54,7 @@ export const createForm = async (form: Form): Promise<void> => {
     await setDoc(formRef, formDict);
 }
 
-export const getForms = async (onlyActive?: boolean): Promise<FormView[]> => {
-    const formsCollectionRef = collection(db, "forms");
+export const getForms = async (onlyActive: boolean = true): Promise<FormView[]> => {
     let querySnapshot;
     if (onlyActive) {
         querySnapshot = await getDocs(query(formsCollectionRef, where("active", "==", true)));
@@ -83,6 +85,11 @@ export const getForm = async (formId: string): Promise<FormSnapshot> => {
 export const patchForm = async (formId: string, form: Partial<FormSnapshot>): Promise<void> => {
     const formRef = doc(db, "forms", formId);
     await updateDoc(formRef, form);
+}
+
+export const setFormActive = async (formId: string, active: boolean): Promise<void> => {
+    const formRef = doc(db, "forms", formId);
+    await updateDoc(formRef, { active });
 }
 
 export const deleteForm = async (formId: string): Promise<void> => {
@@ -160,13 +167,6 @@ export const getResponseMetrics = async (formId: string, responseId: string): Pr
     return metricDicts as Metric[];
 }
 
-export const getResponseAnalytics = async (formId: string, responseId: string): Promise<ResponseAnalytics> => {
-    throw new Error("Not implemented");
-}
-
-export const moveQuestion = async (formId: string, questionId: string, direction: 'up' | 'down', amount: number = 1): Promise<void> => {
-    throw new Error("Not implemented");
-}
 
 export const createQuestion = async (question: Question): Promise<void> => {
     const questionRef = doc(db, "questions", question.id);
@@ -174,7 +174,6 @@ export const createQuestion = async (question: Question): Promise<void> => {
 }
 
 export const getQuestions = async (): Promise<QuestionView[]> => {
-    const questionsCollectionRef = collection(db, "questions");
     const querySnapshot = await getDocs(questionsCollectionRef);
     const questionDicts = querySnapshot.docs.map((doc) => doc.data());
     return questionDicts as QuestionView[];
@@ -188,12 +187,19 @@ export const getQuestion = async (questionId: string): Promise<Question> => {
 }
 
 export const getTrackingId = async (trackingId: string): Promise<Metric[]> => {
-    const metricsCollectionRef = collection(db, "metrics");
     const querySnapshot = await getDocs(
         query(metricsCollectionRef, where("trackingId", "==", trackingId))
     );
     const metricDicts = querySnapshot.docs.map((doc) => doc.data());
     return metricDicts as Metric[];
+}
+
+export const getResponseAnalytics = async (formId: string, responseId: string): Promise<ResponseAnalytics> => {
+    throw new Error("Not implemented");
+}
+
+export const moveQuestion = async (formId: string, questionId: string, direction: 'up' | 'down', amount: number = 1): Promise<void> => {
+    throw new Error("Not implemented");
 }
 
 export const getJob = async (jobId: string): Promise<JobStatus> => {
