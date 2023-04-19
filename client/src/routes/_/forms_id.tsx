@@ -13,7 +13,13 @@ import {
   hasFormAnalytics,
   setFormActive,
 } from "../../api";
-import { FormAnalytics, FormSnapshot, ResponseSnapshot } from "../../typings";
+import {
+  FormAnalytics,
+  FormSnapshot,
+  Question,
+  ResponseAnalytics,
+  ResponseSnapshot,
+} from "../../typings";
 import {
   Typography,
   Drawer,
@@ -33,13 +39,51 @@ import { EmotionsBarStack } from "../../components/EmotionsBarStack";
 const { Content } = Layout;
 const { Title, Text } = Typography;
 
-const buildResponseDescription = (response: ResponseSnapshot) => {
-  const { createdAt, updatedAt } = response;
+const buildQuestionDescription = (question: Question) => {
+  const { createdAt, updatedAt } = question;
 
   const createdAtDate = new Date(createdAt).toLocaleString();
   const updatedAtDate = new Date(updatedAt).toLocaleString();
 
   return `Created at ${createdAtDate}, last updated at ${updatedAtDate}`;
+};
+
+const hydrateQuestionDescription = (
+  question: Question,
+  analytics: FormAnalytics
+) => {
+  const { createdAt } = question;
+
+  const createdAtDate = new Date(createdAt).toLocaleString();
+
+  const keywords = analytics
+    .keywords![question.id].map((keyword) => keyword.label)
+    .slice(0, 3);
+
+  return `Keywords: ${keywords.join(", ")}. Created at ${createdAtDate}.`;
+};
+
+const buildResponseDescription = (response: ResponseSnapshot) => {
+  const { createdAt } = response;
+
+  const createdAtDate = new Date(createdAt).toLocaleString();
+
+  return `Created at ${createdAtDate}.`;
+};
+
+const hydrateResponseDescription = (
+  response: ResponseSnapshot,
+  responseAnalytics: ResponseAnalytics
+) => {
+  const { createdAt } = response;
+
+  const createdAtDate = new Date(createdAt).toLocaleString();
+
+  // const keywords = responseAnalytics
+  //   .keywords!.map((keyword) => keyword.label)
+  //   .slice(0, 3);
+
+  return `Created at ${createdAtDate}.`;
 };
 
 const PlotsPlaceholder: FC<PropsWithChildren> = ({ children }) => {
@@ -62,36 +106,82 @@ export const DashboardForm = () => {
   const [ready, setReady] = useState(false);
   const [form, setForm] = useState<FormSnapshot>();
   const [responses, setResponses] = useState<ResponseSnapshot[]>();
+  const [questionDescriptions, setQuestionDescriptions] = useState<string[]>(
+    []
+  );
   const [responseDescriptions, setResponseDescriptions] = useState<string[]>(
     []
   );
   const [analytics, setAnalytics] = useState<FormAnalytics | undefined>();
+  const [responseAnalytics, setResponseAnalytics] = useState<
+    Record<string, ResponseAnalytics>
+  >({});
+
+  const hydrateDescriptions = useCallback(
+    async (
+      form: FormSnapshot,
+      responses: ResponseSnapshot[],
+      analytics: FormAnalytics
+    ) => {
+      const questionDescriptions = form!.questions.map((question) =>
+        hydrateQuestionDescription(question, analytics)
+      );
+
+      const responseAnalytics = Object.fromEntries(
+        analytics.responseAnalytics!.map((response) => [response.id, response])
+      );
+
+      const responseDescriptions = responses!.map((response) =>
+        hydrateResponseDescription(response, responseAnalytics[response.id]!)
+      );
+
+      setQuestionDescriptions(questionDescriptions);
+      setResponseDescriptions(responseDescriptions);
+    },
+    []
+  );
+
+  const loadAnalytics = useCallback(
+    async (form: FormSnapshot, responses: ResponseSnapshot[]) => {
+      const analytics = await getFormAnalytics(form.id);
+
+      const responseAnalytics = Object.fromEntries(
+        analytics.responseAnalytics!.map((response) => [response.id, response])
+      );
+
+      hydrateDescriptions(form, responses, analytics);
+
+      setAnalytics(analytics);
+      setResponseAnalytics(responseAnalytics);
+    },
+    [hydrateDescriptions]
+  );
 
   const initialize = useCallback(async () => {
     const form = await getForm(formId!);
     const responses = await getResponses(formId!);
 
-    if (await hasFormAnalytics(formId!)) {
-      const analytics = await getFormAnalytics(formId!);
-      setAnalytics(analytics);
-    }
-
+    const questionDescriptions = form.questions.map(buildQuestionDescription);
     const responseDescriptions = responses.map(buildResponseDescription);
+
+    if (await hasFormAnalytics(formId!)) loadAnalytics(form, responses);
 
     setForm(form);
     setResponses(responses);
+
+    setQuestionDescriptions(questionDescriptions);
     setResponseDescriptions(responseDescriptions);
+
     setReady(true);
-  }, [formId, setForm, setResponses, setReady]);
+  }, [formId, setForm, setResponses, setReady, loadAnalytics]);
 
   useEffect(() => {
     if (!ready) initialize();
   }, [ready, initialize]);
 
   const onClickGetAnalytics = useCallback(async () => {
-    const analytics = await getFormAnalytics(formId!);
-    setAnalytics(analytics);
-  }, [formId]);
+    loadAnalytics(form!, responses!);
+  }, [form, responses, loadAnalytics]);
 
   const onClickEdit = useCallback(() => {
     navigate(`/_/forms/${formId}/edit`);
@@ -181,7 +271,6 @@ export const DashboardForm = () => {
                   <div className="w-full h-96 shadow">
                     <ParentSize>
                       {({ width, height }) => (
-                        // <Bar width={width} height={height} />
                         <EmotionsBarStack
                           width={width}
                           height={height}
@@ -206,7 +295,7 @@ export const DashboardForm = () => {
               wrap
               direction="horizontal"
             >
-              {form.questions.map((question) => (
+              {form.questions.map((question, i) => (
                 <Card
                   title={question.question}
                   extra={
@@ -219,10 +308,7 @@ export const DashboardForm = () => {
                   }
                   style={{ width: 300 }}
                 >
-                  <Text>
-                    Lorem, ipsum dolor sit amet consectetur adipisicing elit.
-                    Numquam.
-                  </Text>
+                  <Text>{questionDescriptions[i]}</Text>
                 </Card>
               ))}
             </Space>

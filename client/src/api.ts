@@ -126,6 +126,20 @@ export const getFormAnalytics = async (formId: string): Promise<FormAnalytics> =
     return data as FormAnalytics;
 }
 
+export const getResponseAnalytics = async (formId: string, responseId: string): Promise<ResponseAnalytics> => {
+    const url = buildUrl(apiUrl, {
+        path: `forms/${formId}/responses/${responseId}/analytics`,
+    });
+
+    const response = await fetch(url);
+    if (!response.ok) throw new Error("Failed to get response analytics");
+
+    const data = await response.json();
+
+    return data as ResponseAnalytics;
+}
+
+
 export const createResponse = async (formId: string, _response: Response): Promise<void> => {
     if (_response.metrics.length > 0) throw new Error("Metrics should not be included in response creation");
 
@@ -228,10 +242,6 @@ export const getTrackingId = async (trackingId: string): Promise<Metric[]> => {
 }
 
 export const getFormMetrics = async (formId: string): Promise<Metric[]> => {
-    throw new Error("Not implemented");
-}
-
-export const getResponseAnalytics = async (formId: string, responseId: string): Promise<ResponseAnalytics> => {
     throw new Error("Not implemented");
 }
 

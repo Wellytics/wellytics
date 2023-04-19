@@ -1,27 +1,36 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { Question, ResponseSnapshot } from "../../typings";
-import { getQuestion, getResponses } from "../../api";
-import { Carousel, List, Typography } from "antd";
+import { useParams } from "react-router-dom";
+import { Keyword, Question, ResponseSnapshot } from "../../typings";
+import {
+  getFormAnalytics,
+  getQuestion,
+  getResponses,
+  hasFormAnalytics,
+} from "../../api";
+import { List, Typography } from "antd";
 import ParentSize from "@visx/responsive/lib/components/ParentSize";
 import { Radar } from "../../components/Radar";
-import { Streamgraph } from "../../components/Streamgraph";
-import { Bar } from "../../components/BarStack";
 import { LoadingScreen } from "../../components/LoadingScreen";
+import HighlightedText from "../../components/HighlightedText";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 export const DashboardFormQuestion = () => {
-  const navigate = useNavigate();
   const { formId, questionId } = useParams();
 
   const [ready, setReady] = useState(false);
   const [question, setQuestion] = useState<Question>();
   const [responses, setResponses] = useState<ResponseSnapshot[]>();
+  const [keywords, setKeywords] = useState<Keyword[]>([]);
 
   const initialize = useCallback(async () => {
     const question = await getQuestion(questionId!);
     const responses = await getResponses(formId!);
+
+    if (await hasFormAnalytics(formId!)) {
+      const analytics = await getFormAnalytics(formId!);
+      setKeywords(analytics.keywords![questionId!]);
+    }
 
     setQuestion(question);
     setResponses(responses);
@@ -48,32 +57,18 @@ export const DashboardFormQuestion = () => {
     <div>
       <Title>{question.question}</Title>
 
-      <Carousel>
-        <div className="w-full h-96 shadow">
-          <ParentSize>
-            {({ width, height }) => <Radar width={width} height={height} />}
-          </ParentSize>
-        </div>
-        <div className="w-full h-96 shadow">
-          <ParentSize>
-            {({ width, height }) => (
-              <Streamgraph width={width} height={height} />
-            )}
-          </ParentSize>
-        </div>
-        <div className="w-full h-96 shadow">
-          <ParentSize>
-            {({ width, height }) => <Bar width={width} height={height} />}
-          </ParentSize>
-        </div>
-      </Carousel>
+      <div className="w-full h-96 shadow">
+        <ParentSize>
+          {({ width, height }) => <Radar width={width} height={height} />}
+        </ParentSize>
+      </div>
 
       <List
         bordered
         dataSource={data}
         renderItem={(item) => (
           <List.Item>
-            <Text>{item}</Text>
+            <HighlightedText text={item} keywords={keywords} />
           </List.Item>
         )}
       />

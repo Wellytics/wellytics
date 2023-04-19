@@ -1,23 +1,34 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
-import { FormSnapshot, ResponseSnapshot } from "../../typings";
-import { getForm, getResponse } from "../../api";
+import { useParams } from "react-router-dom";
+import { FormSnapshot, Keyword, ResponseSnapshot } from "../../typings";
+import {
+  getForm,
+  getResponse,
+  getResponseAnalytics,
+  hasResponseAnalytics,
+} from "../../api";
 import { List, Space, Typography } from "antd";
 import { LoadingScreen } from "../../components/LoadingScreen";
+import HighlightedText from "../../components/HighlightedText";
 
-const { Title, Text } = Typography;
+const { Title } = Typography;
 
 export const DashboardFormResponse = () => {
-  const navigate = useNavigate();
   const { formId, responseId } = useParams();
 
   const [ready, setReady] = useState(false);
   const [response, setResponse] = useState<ResponseSnapshot>();
   const [form, setForm] = useState<FormSnapshot>();
+  const [keywords, setKeywords] = useState<Record<string, Keyword[]>>({});
 
   const initialize = useCallback(async () => {
     const response = await getResponse(formId!, responseId!);
     const form = await getForm(formId!);
+
+    if (await hasResponseAnalytics(formId!, responseId!)) {
+      const analytics = await getResponseAnalytics(formId!, responseId!);
+      setKeywords(analytics.keywords!);
+    }
 
     setResponse(response);
     setForm(form);
@@ -33,6 +44,7 @@ export const DashboardFormResponse = () => {
     if (!form) return [];
 
     return form.questions.map((question) => ({
+      questionId: question.id,
       question: question.question,
       answer: JSON.stringify(response.answers[question.id]),
     }));
@@ -48,11 +60,14 @@ export const DashboardFormResponse = () => {
       <List
         bordered
         dataSource={data}
-        renderItem={({ question, answer }) => (
+        renderItem={({ questionId, question, answer }) => (
           <List.Item>
             <Space direction="vertical">
               <Title level={3}>{question}</Title>
-              <Text>{answer}</Text>
+              <HighlightedText
+                text={answer}
+                keywords={keywords[questionId]}
+              />
             </Space>
           </List.Item>
         )}
