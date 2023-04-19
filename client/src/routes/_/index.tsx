@@ -82,16 +82,12 @@ export const DashboardRoot = () => {
     [navigate]
   );
 
-  const onClickQuestion = useCallback(
-    (questionId: string) => {
-      navigate(`/_/questions/${questionId}`);
-    },
-    [navigate]
-  );
-
-  // const onClickMetrics = useCallback(() => {
-  //   navigate(`/_/metrics`);
-  // }, [navigate]);
+  // const onClickQuestion = useCallback(
+  //   (questionId: string) => {
+  //     navigate(`/_/questions/${questionId}`);
+  //   },
+  //   [navigate]
+  // );
 
   const onClickTracking = useCallback(
     (trackingId: string) => {
@@ -135,7 +131,7 @@ export const DashboardRoot = () => {
             ))}
           </Space>
 
-          <Title>Questions</Title>
+          {/* <Title>Questions</Title>
 
           <Space
             style={{
@@ -161,13 +157,7 @@ export const DashboardRoot = () => {
                 <Text>{questionDescriptions[i]}</Text>
               </Card>
             ))}
-          </Space>
-
-          {/* <Title>Metrics</Title>
-
-          <Button type="link" onClick={onClickMetrics}>
-            Go
-          </Button> */}
+          </Space> */}
 
           <Title>Tracking</Title>
 

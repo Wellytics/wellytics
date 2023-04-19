@@ -183,9 +183,9 @@ export const DashboardForm = () => {
     loadAnalytics(form!, responses!);
   }, [form, responses, loadAnalytics]);
 
-  const onClickEdit = useCallback(() => {
-    navigate(`/_/forms/${formId}/edit`);
-  }, [navigate, formId]);
+  // const onClickEdit = useCallback(() => {
+  //   navigate(`/_/forms/${formId}/edit`);
+  // }, [navigate, formId]);
 
   const onClickQuestion = useCallback(
     (questionId: string) => {
@@ -230,11 +230,11 @@ export const DashboardForm = () => {
           <Breadcrumb.Item>{form.title}</Breadcrumb.Item>
         </Breadcrumb>
 
-        <FloatButton.Group shape="square" style={{ left: 24 }}>
+        {/* <FloatButton.Group shape="square" style={{ left: 24 }}>
           <Tooltip placement="right" title="Edit">
             <FloatButton onClick={onClickEdit} />
           </Tooltip>
-        </FloatButton.Group>
+        </FloatButton.Group> */}
 
         <Content style={{ paddingBottom: "50px" }}>
           <Space direction="vertical" className="w-full">
