@@ -6,6 +6,7 @@ import { MetricsCurves } from "../../components/MetricsCurves";
 import { LoadingScreen } from "../../components/LoadingScreen";
 import { Metric } from "../../typings";
 import { getTrackingId } from "../../api";
+import Curves from "../../components/Curves";
 
 const { Content } = Layout;
 const { Title } = Typography;
@@ -18,9 +19,12 @@ export const DashboardTrackingId = () => {
 
   const initialize = useCallback(async () => {
     const metrics = await getTrackingId(trackingId!);
+    
+    console.log(metrics);
+
     setMetrics(metrics);
     setReady(true);
-  }, []);
+  }, [trackingId]);
 
   useEffect(() => {
     if (!ready) initialize();
@@ -47,7 +51,7 @@ export const DashboardTrackingId = () => {
         <div className="w-full h-full">
           <ParentSize>
             {({ width, height }) => (
-              <MetricsCurves width={width} height={height} metrics={metrics} />
+              <Curves width={width} height={height} />
             )}
           </ParentSize>
         </div>

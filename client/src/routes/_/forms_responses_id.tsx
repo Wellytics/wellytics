@@ -66,7 +66,7 @@ export const DashboardFormResponse = () => {
               <Title level={3}>{question}</Title>
               <HighlightedText
                 text={answer}
-                keywords={keywords[questionId]}
+                keywords={keywords[questionId] || []}
               />
             </Space>
           </List.Item>

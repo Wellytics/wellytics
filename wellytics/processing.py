@@ -174,7 +174,7 @@ class OrchestratorThread(threading.Thread):
 
         return ResponseAnalytics(
             id=response.id,
-            createdAt=now,
+            createdAt=response.createdAt,
             updatedAt=now,
             status=JobStatus.Finished,
             jobId=job_id,
@@ -239,7 +239,7 @@ class OrchestratorThread(threading.Thread):
         return FormAnalytics(
             id=form.id,
             formId=form.id,
-            createdAt=now,
+            createdAt=form.createdAt,
             updatedAt=now,
             status=JobStatus.Finished,
             jobId=job_id,

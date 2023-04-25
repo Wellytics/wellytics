@@ -145,6 +145,8 @@ export const DashboardForm = () => {
     async (form: FormSnapshot, responses: ResponseSnapshot[]) => {
       const analytics = await getFormAnalytics(form.id);
 
+      if (analytics.status !== "Finished") return;
+
       const responseAnalytics = Object.fromEntries(
         analytics.responseAnalytics!.map((response) => [response.id, response])
       );

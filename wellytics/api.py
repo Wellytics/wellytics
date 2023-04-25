@@ -14,6 +14,7 @@ from wellytics.processing import (
     _orchestrator_thread,
 )
 from wellytics.models import (
+    Form,
     FormAnalytics,
     FormAnalyticsCollection,
     FormSnapshot,
@@ -22,6 +23,7 @@ from wellytics.models import (
     JobType,
     Metric,
     Question,
+    Response,
     ResponseAnalytics,
     ResponseAnalyticsCollection,
     ResponseSnapshot,
@@ -158,15 +160,13 @@ def _create_form_analytics_jobs(form_id: str) -> str:
             document_ref = firestore.collection(ResponseAnalyticsCollection).document(
                 responseAnalytics.id
             )
-            document_ref.set(
-                {**responseAnalytics.dict(), "status": JobStatus.Finished}
-            )
+            document_ref.set({**responseAnalytics.dict(), "status": JobStatus.Finished})
 
             for _, emotions in responseAnalytics.emotions.items():
                 emotions = {emotion.label: emotion.score for emotion in emotions}
                 metric = Metric(
                     id=uuid(),
-                    createdAt=response.createdAt,
+                    createdAt=responseAnalytics.createdAt,
                     updatedAt=now,
                     trackingId=responseAnalytics.trackingId,
                     values=emotions,
@@ -241,3 +241,74 @@ def get_response_analytics(
         cached_analytics_snapshot = cached_analytics_ref.get()
 
     return ResponseAnalytics(**cached_analytics_snapshot.to_dict())
+
+
+def create_question(question: Question):
+    firestore.collection("questions").document(question.id).set(question.dict())
+
+
+def create_form(form: Form):
+    question_refs = _map(
+        lambda x: firestore.collection("questions").document(x),
+        form.questions,
+    )
+
+    form_dict = form.dict()
+    form_dict["questions"] = question_refs
+
+    firestore.collection("forms").document(form.id).set(form_dict)
+
+
+def create_response(response: Response):
+    form_id = response.formId
+    metric_refs = _map(
+        lambda x: firestore.collection("metrics").document(x), response.metrics
+    )
+
+    response_dict = response.dict()
+    response_dict["metrics"] = metric_refs
+
+    firestore.collection(form_id).document(response.id).set(response_dict)
+
+
+def add_question_to_form(form_id: str, question_id: str) -> None:
+    question_ref = firestore.collection("questions").document(question_id)
+    form_ref = firestore.collection("forms").document(form_id)
+    form_ref.update({"questions": ArrayUnion([question_ref])})
+
+
+def add_metric_to_response(form_id: str, response_id: str, metric_id: str) -> None:
+    metric_ref = firestore.collection("metrics").document(metric_id)
+    response_ref = firestore.collection(form_id).document(response_id)
+    response_ref.update({"metrics": ArrayUnion([metric_ref])})
+
+
+def patch_question(question_id: str, patch: dict) -> None:
+    firestore.collection("questions").document(question_id).update(patch)
+
+
+# TODO: If questions are not added to the form, add them
+def patch_form(form_id: str, patch: dict) -> None:
+    if "questions" in patch:
+        questions = patch.pop("questions")
+        _map(
+            lambda question: patch_question(question["id"], question),
+            questions,
+        )
+
+    firestore.collection("forms").document(form_id).update(patch)
+
+
+def patch_metric(metric_id: str, patch: dict) -> None:
+    firestore.collection("metrics").document(metric_id).update(patch)
+
+
+# TODO: If metrics are not added to the response, add them
+def patch_response(form_id: str, response_id: str, patch: dict) -> None:
+    if "metrics" in patch:
+        metrics = patch.pop("metrics")
+        _map(
+            lambda metric: patch_metric(metric["id"], metric),
+            metrics,
+        )
+    firestore.collection(form_id).document(response_id).update(patch)
