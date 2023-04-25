@@ -13,13 +13,14 @@ export const Root = () => {
 
   const [ready, setReady] = useState(false);
   const [formViews, setFormViews] = useState<FormView[]>([]);
-  const [gotPong, setGotPong] = useState(false);
+  const [gotPong, setGotPong] = useState(true);
 
   const initialize = useCallback(async () => {
+    // const pong = await ping();
+    // setGotPong(pong);
+
     const formViews = await getForms();
-    const pong = await ping();
     setFormViews(formViews);
-    setGotPong(pong);
     setReady(true);
   }, [setReady, setFormViews]);
 
@@ -29,8 +30,9 @@ export const Root = () => {
 
   const onClickDashboard = useCallback(() => {
     // NOTE: For demo-ing purposes
-    // navigate("/_");
-    navigate("/_/auth")
+    // navigate("/_/auth")
+
+    navigate("/_");
   }, [navigate]);
 
   const onClickForm = useCallback(
